@@ -24,34 +24,38 @@ public class Registration
     string Name;
     string userPass;
     string userEmail;
-    TextWriter db = new StreamWriter("userDB.txt", true);//Create a .txt file named userDB. If the param is not set to true then the .txt file is overwritten each run
+
     //string curDir = Directory.GetCurrentDirectory();//Get current directory
     public void userSignUp()//User sign up method
     {
-        WriteLine("\nRegistration");
-        WriteLine("----------");
+        using (TextWriter db = new StreamWriter("userDB.txt", true))
+        //Create a .txt file named userDB. If the param is not set to true then the .txt file is overwritten each run
+        {
+            WriteLine("\nRegistration");
+            WriteLine("----------");
 
-        WriteLine("\nPlease enter your name.");//Ask user for name
-        Name = ReadLine();//Store in var 'Name'
-        db.WriteLine("Name: " + Name);//Write string variable to 
+            WriteLine("\nPlease enter your name.");//Ask user for name
+            Name = ReadLine();//Store in var 'Name'
+            db.WriteLine("Name: " + Name);//Write string variable to 
 
-        WriteLine("\nPlease enter your email address.");
-        userEmail = ReadLine();
-        checkIfExists(userEmail);//Here will go conditional statements to check if email is already in use
-        db.WriteLine("Email: " + userEmail);
+            WriteLine("\nPlease enter your email address.");
+            userEmail = ReadLine();
+            checkIfEmailExists(userEmail);//Here will go conditional statements to check if email is already in use
+            db.WriteLine("Email: " + userEmail);
 
-        WriteLine("\nPlease enter your password.");
-        userPass = ReadLine();
-        checkIfExists(userPass);//Here will go conditional statments to tell user password doent fit criteria
-        db.WriteLine("Password: " + userPass);
+            WriteLine("\nPlease enter your password.");
+            userPass = ReadLine();
+            checkPassParam(userPass);//Here will go conditional statments to tell user password doent fit criteria
+            db.WriteLine("Password: " + userPass);
 
 
 
-        db.WriteLine();
-        WriteLine("\nRegistration Successful!");
-        int milliseconds = 1000;
-        Thread.Sleep(milliseconds);
-        db.Close();
+            db.WriteLine();
+            WriteLine("\nRegistration Successful!");
+            int milliseconds = 1000;
+            Thread.Sleep(milliseconds);
+            db.Close();
+        }
     }
 
     public void checkPassParam(string password)
@@ -59,10 +63,16 @@ public class Registration
 
     }
 
-
-    public void checkIfExists(string nameEmailPassword)
+    public void checkIfEmailExists(string Email)
     {
+        string[] words = File.ReadAllLines("userDB.txt");
 
+
+        //Some while loop that will print errors and re read user input until good password or username is found 
+    }
+    public void checkIfNameExists(string name)
+    {
+        string[] words = File.ReadAllLines("userDB.txt");
 
 
         //Some while loop that will print errors and re read user input until good password or username is found 
