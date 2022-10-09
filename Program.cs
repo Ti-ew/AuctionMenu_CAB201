@@ -1,23 +1,115 @@
-﻿using AuctionMenu;
+﻿
+using AuctionStartMenu;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using static System.Console;
 
 public class SignIn
 {
+    string email;
+    string password;
+    bool emailConfirm = false;
     public void userSignIn()
     {
         WriteLine("\nSign In");
         WriteLine("----------");
 
-        WriteLine("\nPlease enter your email address");
-        ReadLine();
+        WriteLine("\nPlease enter your email address.");
+        checkIfEmailExists(email);
 
         WriteLine("\nPlease enter your password");
-        ReadLine();
+        checkIfPassExists(password);
 
     }
+
+    public void checkIfPassExists(string Pass)
+    {
+        Pass = ReadLine();
+        bool condition = false;
+        string[] words = File.ReadAllLines("userDB.txt");
+
+
+        for (int i = 0; i < words.Length; i++)
+        {
+            if (words[i] == ("Password: " + Pass) && words[i - 1] == ("Email: " + email))
+            {
+
+                condition = true;
+                break;
+            }
+            else
+            {
+                condition = false;
+            }
+        }
+        if (condition == true)
+        {
+            WriteLine("\n...Successful Login");
+            int milliseconds = 1000;
+            Thread.Sleep(milliseconds);
+
+        }
+        if (condition == false)
+        {
+            WriteLine("\nIncorrect password for given email\n");
+            WriteLine("Please enter your password");
+            checkIfPassExists(Pass);
+        }
+
+        //Some while loop that will print errors and re read user input until good password or username is found 
+    }
+
+    public void checkIfEmailExists(string Email)
+    {
+        Email = ReadLine();
+        email = Email;
+        bool condition = false;
+        if (File.Exists("userDB.txt"))
+        {
+
+            string[] words = File.ReadAllLines("userDB.txt");
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (words[i] == ("Email: " + Email))
+                {
+
+                    condition = true;
+                    break;
+                }
+                else
+                {
+                    condition = false;
+                }
+            }
+            if (condition == true)
+            {
+                emailConfirm = true;
+            }
+            if (condition == false)
+            {
+                WriteLine("\nNo email of that type was found");
+                WriteLine("\nPlease enter your email address.");
+
+                checkIfEmailExists(Email);
+            }
+
+            //Some while loop that will print errors and re read user input until good password or username is found 
+        }
+
+        else if (!File.Exists("userDB.txt"))
+        {
+            Console.WriteLine("\nNo database .txt file, try signing up first");
+            Thread.Sleep(1000);
+            Auction auction = new Auction();
+            auction.Start();
+        }
+
+
+
+    }
+
 }
 
 public class Registration
@@ -195,6 +287,7 @@ Please select an option between 1 and 3";
         {
             Auction auction = new Auction();
             auction.Start();
+            //Other page Start functions here
 
 
         }
