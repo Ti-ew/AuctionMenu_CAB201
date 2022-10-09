@@ -1,6 +1,7 @@
 ﻿using AuctionMenu;
 using System;
 using System.IO;
+using System.Linq;
 using static System.Console;
 
 public class SignIn
@@ -37,24 +38,26 @@ public class Registration
             WriteLine("\nPlease enter your name.");//Ask user for name
             Name = ReadLine();//Store in var 'Name'
             db.WriteLine("Name: " + Name);//Write string variable to 
+            db.Close();
 
             WriteLine("\nPlease enter your email address.");
-            userEmail = ReadLine();
             checkIfEmailExists(userEmail);//Here will go conditional statements to check if email is already in use
-            db.WriteLine("Email: " + userEmail);
+
 
             WriteLine("\nPlease enter your password.");
             userPass = ReadLine();
             checkPassParam(userPass);//Here will go conditional statments to tell user password doent fit criteria
-            db.WriteLine("Password: " + userPass);
+            TextWriter EZ = new StreamWriter("userDB.txt", true);
+            EZ.WriteLine("Password: " + userPass);
+            EZ.Close();
 
-
-
-            db.WriteLine();
+            TextWriter YO = new StreamWriter("userDB.txt", true);
+            YO.WriteLine();
+            YO.Close();
             WriteLine("\nRegistration Successful!");
             int milliseconds = 1000;
             Thread.Sleep(milliseconds);
-            db.Close();
+
         }
     }
 
@@ -63,20 +66,45 @@ public class Registration
 
     }
 
+    public void checkEmailValid(string Email)
+    {
+
+    }
+
     public void checkIfEmailExists(string Email)
     {
+        Email = ReadLine();
+        bool condition = false;
         string[] words = File.ReadAllLines("userDB.txt");
+        for (int i = 0; i < words.Length; i++)
+        {
+            if (words[i].Contains("Email: " + Email) == true)
+            {
 
+                condition = true;
+                break;
+            }
+            else
+            {
+                condition = false;
+            }
+        }
+        if (condition == true)
+        {
+            Console.WriteLine("Email already in use");
+            checkIfEmailExists(userEmail);
+        }
+        if (condition == false)
+        {
+            TextWriter SW = new StreamWriter("userDB.txt", true);
+            SW.WriteLine("Email: " + Email);
+            SW.Close();
+            Console.WriteLine("Valid Email");
+        }
 
         //Some while loop that will print errors and re read user input until good password or username is found 
     }
-    public void checkIfNameExists(string name)
-    {
-        string[] words = File.ReadAllLines("userDB.txt");
 
-
-        //Some while loop that will print errors and re read user input until good password or username is found 
-    }
 
 
 }
