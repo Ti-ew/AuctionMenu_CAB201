@@ -8,6 +8,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using static System.Console;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 
 public class SignIn
 {
@@ -20,7 +21,7 @@ public class SignIn
         WriteLine("----------");
 
         WriteLine("\nPlease enter your email address.");
-        checkIfEmailExists(email);
+        checkIfEmailLoginExists(email);
 
         WriteLine("\nPlease enter your password");
         checkIfPassExists(password);
@@ -64,7 +65,7 @@ public class SignIn
         //Some while loop that will print errors and re read user input until good password or username is found 
     }
 
-    public void checkIfEmailExists(string Email)
+    public void checkIfEmailLoginExists(string Email)
     {
         Email = ReadLine();
         email = Email;
@@ -88,14 +89,14 @@ public class SignIn
             }
             if (condition == true)
             {
-                emailConfirm = true;
+
             }
             if (condition == false)
             {
                 WriteLine("\nNo email of that type was found");
                 WriteLine("\nPlease enter your email address.");
 
-                checkIfEmailExists(Email);
+                checkIfEmailLoginExists(Email);
             }
 
             //Some while loop that will print errors and re read user input until good password or username is found 
@@ -125,41 +126,66 @@ public class Registration
     //string curDir = Directory.GetCurrentDirectory();//Get current directory
     public void userSignUp()//User sign up method
     {
-        using (TextWriter db = new StreamWriter("userDB.txt", true))
+
         //Create a .txt file named userDB. If the param is not set to true then the .txt file is overwritten each run
-        {
-            WriteLine("\nRegistration");
-            WriteLine("----------");
-
-            WriteLine("\nPlease enter your name.");//Ask user for name
-            Name = ReadLine();//Store in var 'Name'
-            db.WriteLine("Name: " + Name);//Write string variable to 
-            db.Close();
-
-            WriteLine("\nPlease enter your email address.");
-            checkIfEmailExists(userEmail);//Here will go conditional statements to check if email is already in use
 
 
-            WriteLine("\nPlease enter your password.");
-            userPass = ReadLine();
-            checkPassParam(userPass);//Here will go conditional statments to tell user password doent fit criteria
-            TextWriter EZ = new StreamWriter("userDB.txt", true);
-            EZ.WriteLine("Password: " + userPass);
-            EZ.Close();
 
-            TextWriter YO = new StreamWriter("userDB.txt", true);
-            YO.WriteLine();
-            YO.Close();
-            WriteLine("\nRegistration Successful!");
-            int milliseconds = 1000;
-            Thread.Sleep(milliseconds);
+        WriteLine("\nRegistration");
+        WriteLine("----------");
+        WriteLine("\nPlease enter your name.");//Ask user for name
+        Name = ReadLine();//Store in var 'Name'        
+        WriteLine("\nPlease enter your email address.");
+        checkIfEmailExists(userEmail);//Here will go conditional statements to check if email is already in use
+        WriteLine("\nPlease enter your password.");
+        checkPassParam(userPass);
+        //Here will go conditional statments to tell user password doent fit criteria
 
-        }
+        updateUserDatabase();
+        int milliseconds = 1000;
+        Thread.Sleep(milliseconds);
+
+
+    }
+
+    public void updateUserDatabase()
+    {
+        TextWriter db = new StreamWriter("userDB.txt", true);
+        db.WriteLine("Name: " + Name);//Write string variable to
+        db.Close();
+        TextWriter SW = new StreamWriter("userDB.txt", true);
+        SW.WriteLine("Email: " + userEmail);
+        SW.Close();
+        WriteLine("\nRegistration Successful!");
+        TextWriter EZ = new StreamWriter("userDB.txt", true);
+        EZ.WriteLine("Password: " + userPass);
+        EZ.Close();
     }
 
     public void checkPassParam(string password)
     {
-
+        WriteLine("* At least 8 characters");
+        WriteLine("* No whitespace characters");
+        WriteLine("* At least one uppercase letter");
+        WriteLine("* At least one lowercase letter");
+        WriteLine("* At least one digit");
+        WriteLine("* At least one special character");
+        password = ReadLine();
+        userPass = password;
+        bool state;
+        string patternPass = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+        var regexPass = new Regex(patternPass, RegexOptions.IgnoreCase);
+        state = regexPass.IsMatch(password);
+        if (state == true)
+        {
+            return;
+        }
+        if (state == false)
+        {
+            WriteLine("      The supplied value is not a valid password");
+            Thread.Sleep(1000);
+            checkPassParam(password);
+        }
     }
 
     public bool IsValidEmail(string email)
@@ -172,11 +198,19 @@ public class Registration
 
     public void checkIfEmailExists(string Email)
     {
+
         Email = ReadLine();
+        userEmail = Email;
         if (!IsValidEmail(Email))
         {
+
             WriteLine("Invalid Email");
             checkIfEmailExists(Email);
+        }
+        if (!IsValidEmail(Email))
+        {
+
+            return;
         }
         bool condition = false;
         string[] words = File.ReadAllLines("userDB.txt");
@@ -200,11 +234,10 @@ public class Registration
         }
         if (condition == false)
         {
-            TextWriter SW = new StreamWriter("userDB.txt", true);
-            SW.WriteLine("Email: " + Email);
-            SW.Close();
-            Console.WriteLine("Valid Email");
+
+            Console.WriteLine("\nValid Email");
             return;
+
         }
 
         //Some while loop that will print errors and re read user input until good password or username is found 
@@ -301,7 +334,9 @@ Please select an option between 1 and 3";
             }
         }
     }
-
+}
+namespace Program
+{
     class Begin
     {
         static void Main(string[] args)
@@ -311,6 +346,6 @@ Please select an option between 1 and 3";
             //Other page Start functions here
 
 
+            //}
         }
     }
-}
