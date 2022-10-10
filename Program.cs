@@ -3,8 +3,11 @@ using AuctionStartMenu;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Text.RegularExpressions;
 using static System.Console;
+using System.ComponentModel.DataAnnotations;
 
 public class SignIn
 {
@@ -118,6 +121,7 @@ public class Registration
     string userPass;
     string userEmail;
 
+
     //string curDir = Directory.GetCurrentDirectory();//Get current directory
     public void userSignUp()//User sign up method
     {
@@ -158,14 +162,22 @@ public class Registration
 
     }
 
-    public void checkEmailValid(string Email)
+    public bool IsValidEmail(string email)
     {
+        string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|" + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)" + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
+        var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+        return regex.IsMatch(email);
 
     }
 
     public void checkIfEmailExists(string Email)
     {
         Email = ReadLine();
+        if (!IsValidEmail(Email))
+        {
+            WriteLine("Invalid Email");
+            checkIfEmailExists(Email);
+        }
         bool condition = false;
         string[] words = File.ReadAllLines("userDB.txt");
         for (int i = 0; i < words.Length; i++)
@@ -192,6 +204,7 @@ public class Registration
             SW.WriteLine("Email: " + Email);
             SW.Close();
             Console.WriteLine("Valid Email");
+            return;
         }
 
         //Some while loop that will print errors and re read user input until good password or username is found 
@@ -202,7 +215,14 @@ public class Registration
 }
 
 
+namespace AuctionUserMenu
+{
 
+
+
+
+
+}
 
 namespace AuctionStartMenu
 {
@@ -247,6 +267,7 @@ Please select an option between 1 and 3";
             if (myString == validValues[1])
             {
                 signIn.userSignIn();
+
 
             }
             if (myString == validValues[2])
