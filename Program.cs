@@ -1,20 +1,15 @@
 ﻿
 using AuctionStartMenu;
-using System;
-using System.IO;
-using System.Linq;
-using System.Net.Mail;
-using System.Net;
 using System.Text.RegularExpressions;
 using static System.Console;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Metrics;
+
 
 public class SignIn
 {
-    string email;
+    public static string email;
     string password;
-    bool emailConfirm = false;
+    public static string username;
+
     public void userSignIn()
     {
         WriteLine("\nSign In");
@@ -37,7 +32,7 @@ public class SignIn
 
         for (int i = 0; i < words.Length; i++)
         {
-            if (words[i] == ("Password: " + Pass) && words[i - 1] == ("Email: " + email))
+            if (words[i] == (Pass) && words[i - 1] == (email))
             {
 
                 condition = true;
@@ -68,7 +63,7 @@ public class SignIn
     public void checkIfEmailLoginExists(string Email)
     {
         Email = ReadLine();
-        email = Email;
+
         bool condition = false;
         if (File.Exists("userDB.txt"))
         {
@@ -76,9 +71,10 @@ public class SignIn
             string[] words = File.ReadAllLines("userDB.txt");
             for (int i = 0; i < words.Length; i++)
             {
-                if (words[i] == ("Email: " + Email))
+                if (words[i] == (Email))
                 {
-
+                    username = words[i - 1];
+                    email = Email;
                     condition = true;
                     break;
                 }
@@ -118,9 +114,9 @@ public class SignIn
 
 public class Registration
 {
-    string Name;
-    string userPass;
-    string userEmail;
+    public static string Name;
+    public static string userPass;
+    public static string userEmail;
 
 
     //string curDir = Directory.GetCurrentDirectory();//Get current directory
@@ -142,6 +138,7 @@ public class Registration
         //Here will go conditional statments to tell user password doent fit criteria
 
         updateUserDatabase();
+        WriteLine("\nClient {0}({1}) has successfully registered at the Auction House.", Name, userEmail);
         int milliseconds = 1000;
         Thread.Sleep(milliseconds);
 
@@ -151,14 +148,15 @@ public class Registration
     public void updateUserDatabase()
     {
         TextWriter db = new StreamWriter("userDB.txt", true);
-        db.WriteLine("Name: " + Name);//Write string variable to
+        db.WriteLine(Name);//Write string variable to
         db.Close();
         TextWriter SW = new StreamWriter("userDB.txt", true);
-        SW.WriteLine("Email: " + userEmail);
+        SW.WriteLine(userEmail);
         SW.Close();
-        WriteLine("\nRegistration Successful!");
+
         TextWriter EZ = new StreamWriter("userDB.txt", true);
-        EZ.WriteLine("Password: " + userPass);
+        EZ.WriteLine(userPass);
+        EZ.WriteLine();
         EZ.Close();
     }
 
@@ -216,7 +214,7 @@ public class Registration
         string[] words = File.ReadAllLines("userDB.txt");
         for (int i = 0; i < words.Length; i++)
         {
-            if (words[i].Contains("Email: " + Email) == true)
+            if (words[i].Contains(Email) == true)
             {
 
                 condition = true;
@@ -250,9 +248,6 @@ public class Registration
 
 namespace AuctionUserMenu
 {
-
-
-
 
 
 }
@@ -334,6 +329,193 @@ Please select an option between 1 and 3";
             }
         }
     }
+    class FrontPage
+    {
+        string addy;
+        string unitNum;
+
+
+        static void lineChanger(string newText, string fileName, int line_to_edit)
+        {
+            string[] arrLine = File.ReadAllLines(fileName);
+            arrLine[line_to_edit - 1] = newText;
+            File.WriteAllLines(fileName, arrLine);
+        }
+
+        public void Start()
+        {
+            string[] words = File.ReadAllLines("userDB.txt");
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (words[i] == SignIn.email && words[i + 2] == "")
+                {
+                    WriteLine("\nPersonal Details for {0}({1}).", SignIn.username, SignIn.email);
+                    WriteLine("------------------------------------\n");
+                    WriteLine("Please provide your home address");
+                    while (true)
+                    {
+
+                        Console.WriteLine("Unit number  (0 = none):");
+                        var input = Console.ReadLine();
+
+
+                        if (int.TryParse(input, out var value) && value > 0)
+                        {
+                            addy += input + " ";
+                            break;
+                        }
+                        if (int.TryParse(input, out var bruh) && bruh == 0)
+                        {
+
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("     Unit number must be a non-negative integer.\n");
+                        }
+                    }
+
+
+                    while (true)
+                    {
+
+                        WriteLine("Street number:");
+                        var streetNum = Console.ReadLine();
+
+                        if (int.TryParse(streetNum, out var value) && 0 < value)
+                        {
+                            addy += streetNum + " ";
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("     Street number must be a positive integer.\n");
+                        }
+                    }
+
+                    WriteLine("Street name:");
+                    string streetName = Console.ReadLine();
+                    addy += streetName + " ";
+
+                    WriteLine("Street suffix:");
+                    string streetSuffix = Console.ReadLine();
+
+
+                    addy += streetSuffix + ", ";
+
+                    WriteLine("City:");
+                    string city = Console.ReadLine();
+                    addy += city + " ";
+
+                    string[] values = { "ACT", "act", "NSW", "nsw", "NT", "nt", "QLD", "qld", "SA", "sa", "TAS", "tas", "VIC", "vic", "WA", "wa" };
+                    string emptyString = "";
+                    string state;
+                    while (true)
+                    {
+                        WriteLine("State (ACT, NSW, NT, QLD, SA, TAS, VIC, WA):");
+                        state = Console.ReadLine();
+
+                        if (values.Contains(state))
+                        {
+                            addy += state + " ";
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("     Select a state from the following\n");
+                        }
+                    }
+                    while (true)
+                    {
+
+                        Console.WriteLine("Postcode  (1000 - 9999):");
+                        var postcode = Console.ReadLine();
+
+
+                        if (int.TryParse(postcode, out var value) && value >= 1000 && value <= 9999)
+                        {
+                            addy += postcode + " ";
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("     Invalid postcode.\n");
+                        }
+                    }
+                    TextWriter add = new StreamWriter("userDB.txt", true);
+                    //Write string variable to
+                    add.Close();
+                    lineChanger(addy, "userDB.txt", i + 3);
+
+
+                    WriteLine("Address has been updated to {0}", addy);
+
+
+                    break;
+                }
+
+
+            }
+            //Goto user home page
+
+            string[] options = { "{1} Advertise Product", "{2} View My Product List", "{3} Search For Advertised Products", "{4} View Bids On My Products", "{5} View My Purchased Items", "{6} Log Off" };
+            string prompt = @"
+
+  /$$$$$$  /$$ /$$                       /$$           /$$      /$$                              
+ /$$__  $$| $$|__/                      | $$          | $$$    /$$$                              
+| $$  \__/| $$ /$$  /$$$$$$  /$$$$$$$  /$$$$$$        | $$$$  /$$$$  /$$$$$$  /$$$$$$$  /$$   /$$
+| $$      | $$| $$ /$$__  $$| $$__  $$|_  $$_/        | $$ $$/$$ $$ /$$__  $$| $$__  $$| $$  | $$
+| $$      | $$| $$| $$$$$$$$| $$  \ $$  | $$          | $$  $$$| $$| $$$$$$$$| $$  \ $$| $$  | $$
+| $$    $$| $$| $$| $$_____/| $$  | $$  | $$ /$$      | $$\  $ | $$| $$_____/| $$  | $$| $$  | $$
+|  $$$$$$/| $$| $$|  $$$$$$$| $$  | $$  |  $$$$/      | $$ \/  | $$|  $$$$$$$| $$  | $$|  $$$$$$/
+ \______/ |__/|__/ \_______/|__/  |__/   \___/        |__/     |__/ \_______/|__/  |__/ \______/ 
+                                                                                                 
+                                                                                                 
+                                                                                                 
+
+";
+            Menu mainMenu = new Menu(prompt, options);
+            string[] validValues = new string[] { "1", "2", "3", "4", "5", "6" };
+            string myString = "";
+            Auction auction = new Auction();
+            mainMenu.Display();
+            while (!validValues.Any(myString.Equals))
+                myString = ReadLine();
+            if (myString == validValues[0])
+            {
+                //Advertise class
+            }
+            if (myString == validValues[1])
+            {
+
+                //View Product class
+
+            }
+            if (myString == validValues[2])
+            {
+
+                //View bids on own product
+
+            }
+            if (myString == validValues[3])
+            {
+
+                //View Product class
+
+            }
+            if (myString == validValues[4])
+            {
+
+                //View Purchased items
+
+            }
+            if (myString == validValues[5])
+            {
+                auction.Start();
+            }
+
+        }
+    }
 }
 namespace Program
 {
@@ -341,10 +523,11 @@ namespace Program
     {
         static void Main(string[] args)
         {
+            FrontPage frontPage = new FrontPage();
             Auction auction = new Auction();
             auction.Start();
             //Other page Start functions here
-
+            frontPage.Start();
 
         }
     }
