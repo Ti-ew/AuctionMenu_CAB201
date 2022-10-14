@@ -9,7 +9,7 @@ public class SignIn
     public static string email;
     string password;
     public static string username;
-
+    Auction auction = new Auction();
     public void userSignIn()
     {
         WriteLine("\nSign In");
@@ -90,9 +90,9 @@ public class SignIn
             if (condition == false)
             {
                 WriteLine("\nNo email of that type was found");
-                WriteLine("\nPlease enter your email address.");
-
-                checkIfEmailLoginExists(Email);
+                WriteLine("Please enter a valid email address.");
+                Thread.Sleep(1000);
+                auction.Start();
             }
 
             //Some while loop that will print errors and re read user input until good password or username is found 
