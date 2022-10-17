@@ -126,8 +126,8 @@ namespace AuctionMenu
                 db.WriteLine("{0}", productName);//Write string variable to DB
                 db.WriteLine("{0}", productDescription);//Write string variable to DB
                 db.WriteLine("{0}", verifiedProductPrice);//Write string variable to DB
-                db.WriteLine("");//For external bidder information
-                db.WriteLine("");
+                db.WriteLine("");//Bidder name will go here
+                db.WriteLine("");//Bid amount
                 db.WriteLine("");
                 db.WriteLine("");
                 db.Close();
@@ -150,6 +150,10 @@ namespace AuctionMenu
                         Write(counter + "\t");
                         for (int j = 2; j < 7; j++)
                         {
+                            if (CheckHimPC[i+j] == "")
+                            {
+                                Write("-\t");
+                            }
                             Write(CheckHimPC[i + j] + "\t");
                         }
                         Write("\n");
@@ -178,10 +182,10 @@ namespace AuctionMenu
                     string shoppingSearch = ReadLine();
                     if (shoppingSearch == "ALL" || shoppingSearch == "all")
                     {
-                        WriteLine("\nSearch results\n-------\n");
+                        WriteLine("\nSearch results\n--------------\n");
                         WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
                         int count = 0;
-
+                        string[] str = new string[databaseFile.Length];
                         for (int i = 0; i < databaseFile.Length; i++)
                         {
                             if (databaseFile[i] == "For Sale:")
@@ -190,174 +194,44 @@ namespace AuctionMenu
                                 if (count != 0)
                                 {
                                     Write(count + "\t");
+                                    
                                 }
+                                
                                 for (int j = 2; j < 7; j++)
                                 {
+                                    
                                     if (databaseFile[i + j] != "")
                                     {
-                                        Write("{0}\t", databaseFile[i + j]);
+                                        Write("{0}\t", databaseFile[i + j]);                                       
+                                        str[j-1] = databaseFile[i + j];
                                     }
                                     if (databaseFile[i + j] == "")
                                     {
                                         Write("-\t");
+                                        str[j-1] = "-";
+                                        
                                     }
                                     
 
                                 }
+                                //WAY TO STORE WHAT OPTION
                                 Write("\n");
                                 WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
-                                string answer = ReadLine();
-                                if (answer == "YES" || answer == "yes")
+                                string YesOrNoBid = ReadLine();
+                                if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
                                 {
-                                    WriteLine("Please enter a non-negative integer between 1 and {0}", count);
-                                    string answer2 = ReadLine();
-                                    string[] array = new string[count];
-                                    for (int j = 0; j < count; j++)
+                                    WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
+                                    string answer4 = ReadLine();
+                                    for (int a = 0; a < databaseFile.Length; a++)
                                     {
-                                        array[j] = j.ToString();
-                                    }
-                                    if (array.Contains(answer2))
-                                    {
-                                        WriteLine("Bidding for {0} {1}");
-                                        Write("\nHow much do you bid?");
-                                        string answer3 = ReadLine();
-
-                                        if (answer3.Contains("$"))
+                                        if (answer4 == str[a])
                                         {
-                                            WriteLine("Your bid of {0} for {1} {2} is placed", answer3);
-                                            WriteLine("Delivery Instructions\n-------------");
-                                            WriteLine("(1) Click and collect");
-                                            WriteLine("(2) Home Delivery");
-                                            WriteLine("\nPlease select an option between 1 and 2");
-                                            while (true)
-                                            {
-                                                string answer4 = ReadLine();
-                                                if (answer4 == "1")
-                                                {
-
-                                                }
-                                                if (answer4 == "2")
-                                                {
-                                                    string postalAddy = "";
-                                                    while (true)
-                                                    {
-
-                                                        Console.WriteLine("Unit number  (0 = none):");
-                                                        var input = Console.ReadLine();
-
-
-                                                        if (int.TryParse(input, out var value) && value > 0)
-                                                        {
-                                                            addy += input + "/";
-                                                            break;
-                                                        }
-                                                        if (int.TryParse(input, out var bruh) && bruh == 0)
-                                                        {
-                                                            break;
-                                                        }
-                                                        else
-                                                        {
-                                                            Console.WriteLine("     Unit number must be a non-negative integer.\n");
-                                                        }
-                                                    }
-                                                    Write("\n");
-                                                    //First barrier of correct input
-
-                                                    while (true)
-                                                    {
-
-                                                        WriteLine("Street number:");
-                                                        var streetNum = Console.ReadLine();
-
-                                                        if (int.TryParse(streetNum, out var value) && 0 < value)
-                                                        {
-                                                            addy += streetNum + " ";
-                                                            break;
-                                                        }
-                                                        else
-                                                        {
-                                                            Console.WriteLine("     Street number must be a positive integer.\n");
-                                                        }
-                                                    }
-                                                    Write("\n");
-                                                    //Second barrier of correct input
-
-                                                    WriteLine("Street name:");
-                                                    string streetName = Console.ReadLine();
-                                                    postalAddy += streetName + " ";
-                                                    Write("\n");
-                                                    //No barrier needed
-
-                                                    WriteLine("Street suffix:");
-                                                    string streetSuffix = Console.ReadLine();
-                                                    postalAddy += streetSuffix + ", ";
-                                                    Write("\n");
-                                                    //No barrier needed
-
-                                                    WriteLine("City:");
-                                                    string city = Console.ReadLine();
-                                                    postalAddy += city + " ";
-                                                    Write("\n");
-                                                    //No barrier needed
-
-
-                                                    string[] values = { "ACT", "act", "NSW", "nsw", "NT", "nt", "QLD", "qld", "SA", "sa", "TAS", "tas", "VIC", "vic", "WA", "wa" };
-                                                    string state;
-                                                    while (true)
-                                                    {
-                                                        WriteLine("State (ACT, NSW, NT, QLD, SA, TAS, VIC, WA):");
-                                                        state = Console.ReadLine();
-
-                                                        if (values.Contains(state))
-                                                        {
-                                                            postalAddy += state + " ";
-                                                            break;
-                                                        }
-                                                        else
-                                                        {
-                                                            Console.WriteLine("     Select a state from the following\n");
-                                                        }
-                                                    }
-                                                    Write("\n");
-                                                    //Barrier for enetering a correct state type
-
-
-                                                    while (true)
-                                                    {
-
-                                                        Console.WriteLine("Postcode  (1000 - 9999):");
-                                                        var postcode = Console.ReadLine();
-
-
-                                                        if (int.TryParse(postcode, out var value) && value >= 1000 && value <= 9999)
-                                                        {
-                                                            postalAddy += postcode + " ";
-                                                            break;
-                                                        }
-                                                        else
-                                                        {
-                                                            Console.WriteLine("     Invalid postcode.\n");
-                                                        }
-                                                    }
-                                                    Write("\n");
-                                                    //Barrier for postcode
-
-                                                    TextWriter add = new StreamWriter("userDB.txt", true);
-                                                    add.Close();
-                                                    lineChanger(postalAddy, "userDB.txt", i + 3);
-                                                }
-                                            }
+                                            WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a+1], str[a+2], str[a+5]);
                                         }
-
-
                                     }
-
+                                    
                                 }
-                                else
-                                {
-                                    break;
-                                }
-
+                                break;
                             }
 
                         }

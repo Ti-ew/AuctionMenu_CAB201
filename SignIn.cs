@@ -109,7 +109,11 @@ namespace AuctionMenu
             {
                 WriteLine("\nNo database .txt file, try signing up first");
                 Thread.Sleep(1000);
-                checkIfEmailLoginExists(Email);
+                AuctionMainPage auction = new AuctionMainPage();//Includes the front menu
+                auction.Start(@"+------------------------------+
+| Welcome to the Auction House |
++------------------------------+
+");//Includes registration menu 
 
             }
 

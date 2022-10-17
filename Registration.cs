@@ -20,7 +20,12 @@ namespace AuctionMenu
         {
 
             //Create a .txt file named userDB. If the param is not set to true then the .txt file is overwritten each run
-
+            if (!File.Exists("userDB.txt"))
+            {
+                TextWriter newTextIfNone = new StreamWriter("userDB.txt", true);
+                newTextIfNone.Close();
+            }
+            
 
 
             WriteLine("\nRegistration");
