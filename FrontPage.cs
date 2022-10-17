@@ -66,7 +66,7 @@ namespace AuctionMenu
                                 Console.Write("{0}\t", ArrayOfWords[i + j]);
                             }
 
-                            /*Purchased + {USERNAME} 
+                            /*Purchased from {SELLER EMAIL}: {USERNAME} 
                                 * Item num 
                                 * Seller email 
                                 * Product name
@@ -130,6 +130,7 @@ namespace AuctionMenu
                 db.WriteLine("");//Bid amount
                 db.WriteLine("");
                 db.WriteLine("");
+                db.WriteLine("");
                 db.Close();
             }
             void viewProduct()
@@ -148,7 +149,7 @@ namespace AuctionMenu
                     if (CheckHimPC[i] == "For Sale:" && CheckHimPC[i + 1] == SignIn.username)
                     {
                         Write(counter + "\t");
-                        for (int j = 2; j < 7; j++)
+                        for (int j = 2; j < 8; j++)
                         {
                             if (CheckHimPC[i+j] == "")
                             {
@@ -190,54 +191,71 @@ namespace AuctionMenu
                         {
                             if (databaseFile[i] == "For Sale:")
                             {
-                                count++;
-                                if (count != 0)
-                                {
-                                    Write(count + "\t");
-                                    
-                                }
-                                
-                                for (int j = 2; j < 7; j++)
+                                if (!databaseFile[i+1].Contains(SignIn.username))
                                 {
                                     
-                                    if (databaseFile[i + j] != "")
+                                    count++;
+                                    if (count != 0)
                                     {
-                                        Write("{0}\t", databaseFile[i + j]);                                       
-                                        str[j-1] = databaseFile[i + j];
-                                    }
-                                    if (databaseFile[i + j] == "")
-                                    {
-                                        Write("-\t");
-                                        str[j-1] = "-";
-                                        
-                                    }
-                                    
+                                        Write(count + "\t");
+                                        str[count - 1] = count.ToString();
 
-                                }
-                                //WAY TO STORE WHAT OPTION
-                                Write("\n");
-                                WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
-                                string YesOrNoBid = ReadLine();
-                                if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
-                                {
-                                    WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
-                                    string answer4 = ReadLine();
-                                    for (int a = 0; a < databaseFile.Length; a++)
+                                    }
+
+                                    for (int j = 2; j < 8; j++)
                                     {
-                                        if (answer4 == str[a])
+
+                                        if (databaseFile[i + j] != "")
                                         {
-                                            WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a+1], str[a+2], str[a+5]);
+                                            Write("{0}\t", databaseFile[i + j]);
+                                            
+                                            str[j - 1] = databaseFile[i + j];
                                         }
+                                        if (databaseFile[i + j] == "")
+                                        {
+                                            Write("-\t");
+                                            str[j - 1] = "-";
+
+                                        }
+
+
                                     }
                                     
+                                    Write("\n");
+
                                 }
-                                break;
                             }
-
+                            
                         }
-
-
+                        if (count == 0)
+                        {
+                            WriteLine("\nNothing for sale");
+                            break;
+                        }
+                        
+                        WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
+                        string YesOrNoBid = ReadLine();
+                        if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
+                        {
+                            WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
+                            string answer4 = ReadLine();
+                            for (int a = 0; a < databaseFile.Length; a++)
+                            {
+                                if (answer4 == str[a])
+                                {
+                                    WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a+1], str[a+2], str[a+5]);
+                                    ReadLine
+                                }
+                            }
+                                    
+                        }
                         break;
+                          
+
+                     
+
+
+                        
                     }
                     if (shoppingSearch == "something specific")
                     {
@@ -371,6 +389,7 @@ namespace AuctionMenu
                     //Barrier for postcode
 
                     TextWriter add = new StreamWriter("userDB.txt", true);
+                    add.WriteLine("");
                     add.Close();
                     lineChanger(addy, "userDB.txt", i + 3);
                     WriteLine("Address has been updated to {0}", addy);
