@@ -14,8 +14,10 @@ namespace AuctionMenu
     {
         string addy;
 
+        string productName;
+        static string[] databaseFile = File.ReadAllLines("userDB.txt");
 
-
+        static string[] str = new string[databaseFile.Length];
         static void lineChanger(string newText, string fileName, int line_to_edit)
         {
             string[] arrLine = File.ReadAllLines(fileName);
@@ -35,7 +37,22 @@ namespace AuctionMenu
 
         public void Start()
         {
+            void updateBid(string bid)
+            {
+                int lineForEditing = 0;
 
+                for (int i = 5; i < databaseFile.Length; i++)
+                {
+                    if (databaseFile[i] == productName)
+                    {
+                        lineForEditing = i;
+                    }
+                }
+                lineChanger(bid, "userDB.txt", lineForEditing + 5);
+                lineChanger(SignIn.email, "userDB.txt", lineForEditing + 4);
+                lineChanger(SignIn.username, "userDB.txt", lineForEditing + 3);
+
+            }
             void viewPurchased()
             {
                 WriteLine("Purchased items for {0}({1})", SignIn.username, SignIn.email);
@@ -151,7 +168,7 @@ namespace AuctionMenu
                         Write(counter + "\t");
                         for (int j = 2; j < 8; j++)
                         {
-                            if (CheckHimPC[i+j] == "")
+                            if (CheckHimPC[i + j] == "")
                             {
                                 Write("-\t");
                             }
@@ -169,13 +186,13 @@ namespace AuctionMenu
             }
             void goShopping()
             {
-                WriteLine("Product search for {0}({1})", SignIn.username, SignIn.email);
+                WriteLine("\nProduct search for {0}({1})", SignIn.username, SignIn.email);
                 string productSearch = "Product search for {0}({1)";
                 int productSearchLen = productSearch.Length + SignIn.username.Length + SignIn.email.Length - 6;
                 lineUnderliner(productSearchLen);
 
 
-                string[] databaseFile = File.ReadAllLines("userDB.txt");
+
 
                 while (true)
                 {
@@ -186,21 +203,23 @@ namespace AuctionMenu
                         WriteLine("\nSearch results\n--------------\n");
                         WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
                         int count = 0;
-                        string[] str = new string[databaseFile.Length];
+                        int secondCount = 0;
+
                         for (int i = 0; i < databaseFile.Length; i++)
                         {
                             if (databaseFile[i] == "For Sale:")
                             {
-                                if (!databaseFile[i+1].Contains(SignIn.username))
+                                if (!databaseFile[i + 1].Contains(SignIn.username))
                                 {
-                                    
+
                                     count++;
                                     if (count != 0)
                                     {
                                         Write(count + "\t");
-                                        str[count - 1] = count.ToString();
+                                        str[secondCount] = count.ToString();
 
                                     }
+
 
                                     for (int j = 2; j < 8; j++)
                                     {
@@ -208,56 +227,55 @@ namespace AuctionMenu
                                         if (databaseFile[i + j] != "")
                                         {
                                             Write("{0}\t", databaseFile[i + j]);
-                                            
-                                            str[j - 1] = databaseFile[i + j];
+
+                                            str[j - 1 + secondCount] = databaseFile[i + j];
                                         }
                                         if (databaseFile[i + j] == "")
                                         {
                                             Write("-\t");
-                                            str[j - 1] = "-";
+                                            str[j - 1 + secondCount] = "-";
 
                                         }
 
 
                                     }
-                                    
+                                    secondCount += 8;
                                     Write("\n");
 
                                 }
+
                             }
-                            
+
                         }
                         if (count == 0)
                         {
                             WriteLine("\nNothing for sale");
                             break;
                         }
-                        
+
                         WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
                         string YesOrNoBid = ReadLine();
                         if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
                         {
                             WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
                             string answer4 = ReadLine();
+
                             for (int a = 0; a < databaseFile.Length; a++)
                             {
                                 if (answer4 == str[a])
                                 {
-                                    WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a+1], str[a+2], str[a+5]);
-                                    ReadLine
+                                    WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a + 1], str[a + 3], str[a + 5]);
+                                    WriteLine("\nHow much do you bid?");
+                                    string bidAmount = ReadLine();
+                                    productName = str[a + 1];
+                                    updateBid(bidAmount);
+                                    WriteLine("\nYour bid of {0} for {1} has been placed", bidAmount, productName);
                                 }
                             }
-                                    
                         }
                         break;
-                          
-
-                     
-
-
-                        
                     }
-                    if (shoppingSearch == "something specific")
+                    if (databaseFile.Contains(productSearch))
                     {
 
                     }
