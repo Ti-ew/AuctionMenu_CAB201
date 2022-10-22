@@ -152,7 +152,7 @@ namespace AuctionMenu
             }
             void viewProduct()
             {
-                bool state = false;
+
                 string[] CheckHimPC = File.ReadAllLines("userDB.txt");//Check is bro is broke and isnt advertising
                 WriteLine("Product List for {0}({1})", SignIn.username, SignIn.email);
                 string anotherUnderline = "Product List for {0}({1})";
@@ -420,6 +420,7 @@ namespace AuctionMenu
 
             }
             //goto user home page
+
             while (true)
             {
                 string[] options = { "(1) Advertise product", "(2) View my product list", "(3) Search for advertised products", "(4) View bids on my products", "(5) View my purchased items", "(6) Log off" };
@@ -468,13 +469,15 @@ namespace AuctionMenu
                 if (mystring == validvalues[5])
                 {
 
-                    AuctionMainPage auction = new AuctionMainPage();//Includes the front menu
-                    auction.Start(@"");
-                    //Includes registration menu (looped to send user back to front menu)
-                    //Exit of this first menu is done by loggin in successfully
+                    break;
+
                 }
 
             }
+
+
         }
+
+
     }
 }

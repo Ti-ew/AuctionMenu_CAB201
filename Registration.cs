@@ -25,16 +25,19 @@ namespace AuctionMenu
                 TextWriter newTextIfNone = new StreamWriter("userDB.txt", true);
                 newTextIfNone.Close();
             }
-            
+
 
 
             WriteLine("\nRegistration");
             WriteLine("------------");
-            WriteLine("\nPlease enter your name");//Ask user for name
-            Name = ReadLine();//Store in var 'Name'        
+
+            //Store in var 'Name'
+            IsValidName();
             WriteLine("\nPlease enter your email address");
+
             checkIfEmailExists(userEmail);//Here will go conditional statements to check if email is already in use
             WriteLine("\nPlease choose a password");
+
             checkPassParam(userPass);
             //Here will go conditional statments to tell user password doent fit criteria
 
@@ -86,7 +89,20 @@ namespace AuctionMenu
                 checkPassParam(password);
             }
         }
+        public void IsValidName()
+        {
 
+            while (true)
+            {
+                WriteLine("\nPlease enter your name");//Ask user for name
+                Name = ReadLine();
+                if (!Name.Contains("@"))
+                {
+                    break;
+                }
+
+            }
+        }
         public bool IsValidEmail(string email)
         {
             string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|" + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)" + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";

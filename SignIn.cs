@@ -78,6 +78,10 @@ namespace AuctionMenu
                     {
                         if (words[i] == (Email))
                         {
+                            if (!Email.Contains("@"))
+                            {
+                                break;
+                            }
                             username = words[i - 1];
                             email = Email;
                             condition = true;

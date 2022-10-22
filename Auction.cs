@@ -30,9 +30,7 @@ namespace AuctionMenu
             {
                 Registration registration = new Registration();
                 registration.userSignUp();
-                AuctionMainPage auction = new AuctionMainPage();
-                prompt = "";
-                auction.Start(prompt);
+                
 
             }
 
