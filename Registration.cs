@@ -13,7 +13,7 @@ namespace AuctionMenu
         public static string Name;
         public static string userPass;
         public static string userEmail;
-
+        public static string prompt = "";
 
         //string curDir = Directory.GetCurrentDirectory();//Get current directory
         public void userSignUp()//User sign up method
@@ -33,18 +33,20 @@ namespace AuctionMenu
 
             //Store in var 'Name'
             IsValidName();
+
             WriteLine("\nPlease enter your email address");
-
             checkIfEmailExists(userEmail);//Here will go conditional statements to check if email is already in use
-            WriteLine("\nPlease choose a password");
 
+            WriteLine("\nPlease choose a password");
             checkPassParam(userPass);
             //Here will go conditional statments to tell user password doent fit criteria
 
             updateUserDatabase();
             WriteLine("\nClient {0}({1}) has successfully registered at the Auction House.", Name, userEmail);
-            int milliseconds = 1000;
-            Thread.Sleep(milliseconds);
+
+            AuctionMainPage auction = new AuctionMainPage();//Includes the front menu
+            auction.Start(prompt);//Includes registration menu (looped to send user back to front menu)
+                                  //Exit of this first menu is done by loggin in successfully
 
 
         }
@@ -124,10 +126,10 @@ namespace AuctionMenu
                 return;
             }
             bool condition = false;
-            string[] words = File.ReadAllLines("userDB.txt");
-            for (int i = 0; i < words.Length; i++)
+            string[] databaseFile = File.ReadAllLines("userDB.txt");
+            for (int i = 0; i < databaseFile.Length; i++)
             {
-                if (words[i].Contains(Email) == true)
+                if (databaseFile[i].Contains(Email) == true)
                 {
 
                     condition = true;

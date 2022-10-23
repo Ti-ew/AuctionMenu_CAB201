@@ -29,7 +29,8 @@ namespace Program
                 FrontPage frontPage = new FrontPage();//First page passed signing up && || logging in
                 frontPage.Start();//Begin to check if address has been already input or not
                 prompt = "";
-
+                
+                
             }
 
 

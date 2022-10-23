@@ -15,9 +15,15 @@ namespace AuctionMenu
         string addy;
 
         string productName;
-        static string[] databaseFile = File.ReadAllLines("userDB.txt");
 
-        static string[] str = new string[databaseFile.Length];
+        static string[] str = File.ReadAllLines("userDB.txt");
+
+        string[] readDB(string DB)
+        {
+            string[] databaseFile = File.ReadAllLines(DB);
+            return databaseFile;
+        }
+
         static void lineChanger(string newText, string fileName, int line_to_edit)
         {
             string[] arrLine = File.ReadAllLines(fileName);
@@ -39,18 +45,20 @@ namespace AuctionMenu
         {
             void updateBid(string bid)
             {
+                string[] databaseFile = readDB("userDB.txt");
                 int lineForEditing = 0;
 
-                for (int i = 5; i < databaseFile.Length; i++)
+                for (int i = 0; i < databaseFile.Length; i++)
                 {
                     if (databaseFile[i] == productName)
                     {
                         lineForEditing = i;
                     }
                 }
-                lineChanger(bid, "userDB.txt", lineForEditing + 5);
-                lineChanger(SignIn.email, "userDB.txt", lineForEditing + 4);
-                lineChanger(SignIn.username, "userDB.txt", lineForEditing + 3);
+                lineChanger(bid, "userDB.txt", lineForEditing + 7);
+                lineChanger(SignIn.email, "userDB.txt", lineForEditing + 6);
+                lineChanger(SignIn.username, "userDB.txt", lineForEditing + 5);
+
 
             }
             void viewPurchased()
@@ -60,27 +68,27 @@ namespace AuctionMenu
                 lineUnderliner(tempUnderline);
                 // Stuff for the table, PIPE deez
                 WriteLine("Item #\tSeller email\tProduct name\tDescription\tList price\tAmt paid\tDelivery Option");
+                string[] databaseFile = readDB("userDB.txt");
 
-                string[] ArrayOfWords = File.ReadAllLines("userDB.txt");
-                for (int j = 0; j < ArrayOfWords.Length; j++)
+                for (int j = 0; j < databaseFile.Length; j++)
                 {
 
                     //Dont know how it is being formatted in text document, lets have a looky
                     //Here goes the stuff to check if it is a value or a "-"
-                    if (ArrayOfWords[j] == "Purchased: " + SignIn.username)
+                    if (databaseFile[j] == "Purchased: " + SignIn.username)
                     {
 
                         for (int i = 0; i < 7; i++)
                         {
                             //Write string variable to the line under purchased so format it
 
-                            if (ArrayOfWords[i + j] == "")
+                            if (databaseFile[i + j] == "")
                             {
                                 Console.Write("-\t");
                             }
                             else
                             {
-                                Console.Write("{0}\t", ArrayOfWords[i + j]);
+                                Console.Write("{0}\t", databaseFile[i + j]);
                             }
 
                             /*Purchased from {SELLER EMAIL}: {USERNAME} 
@@ -153,26 +161,27 @@ namespace AuctionMenu
             void viewProduct()
             {
 
-                string[] CheckHimPC = File.ReadAllLines("userDB.txt");//Check is bro is broke and isnt advertising
+                //Check iF bro is broke and isnt advertising
                 WriteLine("Product List for {0}({1})", SignIn.username, SignIn.email);
                 string anotherUnderline = "Product List for {0}({1})";
                 int lengthOfUnderline = anotherUnderline.Length + SignIn.email.Length + SignIn.username.Length - 6;
                 lineUnderliner(lengthOfUnderline);
                 WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
                 int counter = 1;
-                for (int i = 0; i < CheckHimPC.Length; i++)
+                string[] databaseFile = readDB("userDB.txt");
+                for (int i = 0; i < databaseFile.Length; i++)
                 {
 
-                    if (CheckHimPC[i] == "For Sale:" && CheckHimPC[i + 1] == SignIn.username)
+                    if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username)
                     {
                         Write(counter + "\t");
                         for (int j = 2; j < 8; j++)
                         {
-                            if (CheckHimPC[i + j] == "")
+                            if (databaseFile[i + j] == "")
                             {
                                 Write("-\t");
                             }
-                            Write(CheckHimPC[i + j] + "\t");
+                            Write(databaseFile[i + j] + "\t");
                         }
                         Write("\n");
                         counter++;
@@ -196,6 +205,7 @@ namespace AuctionMenu
 
                 while (true)
                 {
+                    string[] databaseFile = readDB("userDB.txt");
                     WriteLine("\nPlease supply a search phrase (ALL to see all products)");
                     string shoppingSearch = ReadLine();
                     if (shoppingSearch == "ALL" || shoppingSearch == "all")
@@ -289,191 +299,196 @@ namespace AuctionMenu
 
             }
 
-            string[] words = File.ReadAllLines("userDB.txt");
-            for (int i = 0; i < words.Length; i++)
+            while (File.Exists("userDB.txt"))
             {
-                if (words[i] == SignIn.email && words[i + 2] == "")//Ask for addy if not given
+                string[] databaseFile = readDB("userDB.txt");
+                for (int i = 0; i < databaseFile.Length; i++)
                 {
-                    //Whole bunch of while loops to continue to ask user until correct output is given
-
-                    WriteLine("\nPersonal Details for {0}({1})", SignIn.username, SignIn.email);
-                    string PersonalDetails = "Personal Details for {0}({1})";
-                    int PersonalDetailsLength = (PersonalDetails.Length + SignIn.username.Length + SignIn.email.Length - 6);
-                    lineUnderliner(PersonalDetailsLength);
-                    WriteLine("\nPlease provide your home address.\n");
-                    //Whole bunch of main menu printing logic
-
-                    while (true)
+                    if (databaseFile[i] == SignIn.email && databaseFile[i + 2] == "")//Ask for addy if not given
                     {
+                        //Whole bunch of while loops to continue to ask user until correct output is given
 
-                        Console.WriteLine("Unit number  (0 = none):");
-                        var input = Console.ReadLine();
+                        WriteLine("\nPersonal Details for {0}({1})", SignIn.username, SignIn.email);
+                        string PersonalDetails = "Personal Details for {0}({1})";
+                        int PersonalDetailsLength = (PersonalDetails.Length + SignIn.username.Length + SignIn.email.Length - 6);
+                        lineUnderliner(PersonalDetailsLength);
+                        WriteLine("\nPlease provide your home address.\n");
+                        //Whole bunch of main menu printing logic
+
+                        while (true)
+                        {
+
+                            Console.WriteLine("Unit number  (0 = none):");
+                            var input = Console.ReadLine();
 
 
-                        if (int.TryParse(input, out var value) && value > 0)
-                        {
-                            addy += input + "/";
-                            break;
+                            if (int.TryParse(input, out var value) && value > 0)
+                            {
+                                addy += input + "/";
+                                break;
+                            }
+                            if (int.TryParse(input, out var bruh) && bruh == 0)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("     Unit number must be a non-negative integer.\n");
+                            }
                         }
-                        if (int.TryParse(input, out var bruh) && bruh == 0)
+                        Write("\n");
+                        //First barrier of correct input
+
+                        while (true)
                         {
-                            break;
+
+                            WriteLine("Street number:");
+                            var streetNum = Console.ReadLine();
+
+                            if (int.TryParse(streetNum, out var value) && 0 < value)
+                            {
+                                addy += streetNum + " ";
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("     Street number must be a positive integer.\n");
+                            }
                         }
-                        else
+                        Write("\n");
+                        //Second barrier of correct input
+
+                        WriteLine("Street name:");
+                        string streetName = Console.ReadLine();
+                        addy += streetName + " ";
+                        Write("\n");
+                        //No barrier needed
+
+                        WriteLine("Street suffix:");
+                        string streetSuffix = Console.ReadLine();
+                        addy += streetSuffix + ", ";
+                        Write("\n");
+                        //No barrier needed
+
+                        WriteLine("City:");
+                        string city = Console.ReadLine();
+                        addy += city + " ";
+                        Write("\n");
+                        //No barrier needed
+
+
+                        string[] values = { "ACT", "act", "NSW", "nsw", "NT", "nt", "QLD", "qld", "SA", "sa", "TAS", "tas", "VIC", "vic", "WA", "wa" };
+                        string state;
+                        while (true)
                         {
-                            Console.WriteLine("     Unit number must be a non-negative integer.\n");
+                            WriteLine("State (ACT, NSW, NT, QLD, SA, TAS, VIC, WA):");
+                            state = Console.ReadLine();
+
+                            if (values.Contains(state))
+                            {
+                                addy += state + " ";
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("     Select a state from the following\n");
+                            }
                         }
+                        Write("\n");
+                        //Barrier for enetering a correct state type
+
+
+                        while (true)
+                        {
+
+                            Console.WriteLine("Postcode  (1000 - 9999):");
+                            var postcode = Console.ReadLine();
+
+
+                            if (int.TryParse(postcode, out var value) && value >= 1000 && value <= 9999)
+                            {
+                                addy += postcode + " ";
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("     Invalid postcode.\n");
+                            }
+                        }
+                        Write("\n");
+                        //Barrier for postcode
+
+                        TextWriter add = new StreamWriter("userDB.txt", true);
+                        add.WriteLine("");
+                        add.Close();
+                        lineChanger(addy, "userDB.txt", i + 3);
+                        WriteLine("Address has been updated to {0}", addy);
+                        //Updating .txt file
+
+
+                        break;//break the for loop
                     }
-                    Write("\n");
-                    //First barrier of correct input
+                    //If no addy is needed
 
-                    while (true)
-                    {
-
-                        WriteLine("Street number:");
-                        var streetNum = Console.ReadLine();
-
-                        if (int.TryParse(streetNum, out var value) && 0 < value)
-                        {
-                            addy += streetNum + " ";
-                            break;
-                        }
-                        else
-                        {
-                            Console.WriteLine("     Street number must be a positive integer.\n");
-                        }
-                    }
-                    Write("\n");
-                    //Second barrier of correct input
-
-                    WriteLine("Street name:");
-                    string streetName = Console.ReadLine();
-                    addy += streetName + " ";
-                    Write("\n");
-                    //No barrier needed
-
-                    WriteLine("Street suffix:");
-                    string streetSuffix = Console.ReadLine();
-                    addy += streetSuffix + ", ";
-                    Write("\n");
-                    //No barrier needed
-
-                    WriteLine("City:");
-                    string city = Console.ReadLine();
-                    addy += city + " ";
-                    Write("\n");
-                    //No barrier needed
-
-
-                    string[] values = { "ACT", "act", "NSW", "nsw", "NT", "nt", "QLD", "qld", "SA", "sa", "TAS", "tas", "VIC", "vic", "WA", "wa" };
-                    string state;
-                    while (true)
-                    {
-                        WriteLine("State (ACT, NSW, NT, QLD, SA, TAS, VIC, WA):");
-                        state = Console.ReadLine();
-
-                        if (values.Contains(state))
-                        {
-                            addy += state + " ";
-                            break;
-                        }
-                        else
-                        {
-                            Console.WriteLine("     Select a state from the following\n");
-                        }
-                    }
-                    Write("\n");
-                    //Barrier for enetering a correct state type
-
-
-                    while (true)
-                    {
-
-                        Console.WriteLine("Postcode  (1000 - 9999):");
-                        var postcode = Console.ReadLine();
-
-
-                        if (int.TryParse(postcode, out var value) && value >= 1000 && value <= 9999)
-                        {
-                            addy += postcode + " ";
-                            break;
-                        }
-                        else
-                        {
-                            Console.WriteLine("     Invalid postcode.\n");
-                        }
-                    }
-                    Write("\n");
-                    //Barrier for postcode
-
-                    TextWriter add = new StreamWriter("userDB.txt", true);
-                    add.WriteLine("");
-                    add.Close();
-                    lineChanger(addy, "userDB.txt", i + 3);
-                    WriteLine("Address has been updated to {0}", addy);
-                    //Updating .txt file
-
-
-                    break;//break the for loop
                 }
-                //If no addy is needed
+                while (true)
+                {
+                    string[] options = { "(1) Advertise product", "(2) View my product list", "(3) Search for advertised products", "(4) View bids on my products", "(5) View my purchased items", "(6) Log off" };
+                    WriteLine("\nClient Menu\r\n-----------");
+                    for (int i = 0; i < options.Length; i++)
+                    {
+                        string currentOption = options[i];
+                        WriteLine($"{currentOption}");
+                    }
 
+
+                    string[] validvalues = new string[] { "1", "2", "3", "4", "5", "6" };
+                    string mystring = "";
+                    mystring = ReadLine();
+                    if (mystring == validvalues[0])
+                    {
+                        //advertise method
+                        advertiseProduct();
+                    }
+                    if (mystring == validvalues[1])
+                    {
+
+                        viewProduct();
+
+                    }
+                    if (mystring == validvalues[2])
+                    {
+
+                        //Time to go shopping brah!
+                        goShopping();
+
+                    }
+                    if (mystring == validvalues[3])
+                    {
+                        //view bids on own product
+                        viewBids();
+
+
+                    }
+                    if (mystring == validvalues[4])
+                    {
+
+                        viewPurchased();
+
+                    }
+                    if (mystring == validvalues[5])
+                    {
+
+                        break;
+
+                    }
+
+                }
+                break;
             }
             //goto user home page
 
-            while (true)
-            {
-                string[] options = { "(1) Advertise product", "(2) View my product list", "(3) Search for advertised products", "(4) View bids on my products", "(5) View my purchased items", "(6) Log off" };
-                WriteLine("\nClient Menu\r\n-----------");
-                for (int i = 0; i < options.Length; i++)
-                {
-                    string currentOption = options[i];
-                    WriteLine($"{currentOption}");
-                }
 
-
-                string[] validvalues = new string[] { "1", "2", "3", "4", "5", "6" };
-                string mystring = "";
-                mystring = ReadLine();
-                if (mystring == validvalues[0])
-                {
-                    //advertise method
-                    advertiseProduct();
-                }
-                if (mystring == validvalues[1])
-                {
-
-                    viewProduct();
-
-                }
-                if (mystring == validvalues[2])
-                {
-
-                    //Time to go shopping brah!
-                    goShopping();
-
-                }
-                if (mystring == validvalues[3])
-                {
-                    //view bids on own product
-                    viewBids();
-
-
-                }
-                if (mystring == validvalues[4])
-                {
-
-                    viewPurchased();
-
-                }
-                if (mystring == validvalues[5])
-                {
-
-                    break;
-
-                }
-
-            }
 
 
         }

@@ -9,6 +9,7 @@ namespace AuctionMenu
 {
     public class SignIn
     {
+        public bool flag = true;
         public static string email;
         public static string password;
         public static string username;
@@ -18,24 +19,40 @@ namespace AuctionMenu
             WriteLine("\nSign In");
             WriteLine("-------");
 
+            checkIfDBExists();
+            if (flag == false)
+            {
+                return;
+            }
 
             checkIfEmailLoginExists(email);
+
 
             WriteLine("\nPlease enter your password");
             checkIfPassExists(password);
 
         }
 
+        public void checkIfDBExists()
+        {
+            if (!File.Exists("userDB.txt"))
+            {
+                flag = false;
+                WriteLine("\nNo database .txt file, try signing up first");
+                return;
+            }
+        }
+
         public void checkIfPassExists(string Pass)
         {
             Pass = ReadLine();
             bool condition = false;
-            string[] words = File.ReadAllLines("userDB.txt");
+            string[] databaseFile = File.ReadAllLines("userDB.txt");
 
 
-            for (int i = 0; i < words.Length; i++)
+            for (int i = 0; i < databaseFile.Length; i++)
             {
-                if (words[i] == (Pass) && words[i - 1] == (email))
+                if (databaseFile[i] == (Pass) && databaseFile[i - 1] == (email))
                 {
 
                     condition = true;
@@ -54,7 +71,7 @@ namespace AuctionMenu
             }
             if (condition == false)
             {
-                WriteLine("\nIncorrect password for given email\n");
+                WriteLine("\nIncorrect password for given email");
 
                 checkIfPassExists(Pass);
             }
@@ -73,16 +90,16 @@ namespace AuctionMenu
                 {
                     WriteLine("\nPlease enter your email address");
                     Email = ReadLine();
-                    string[] words = File.ReadAllLines("userDB.txt");
-                    for (int i = 0; i < words.Length; i++)
+                    string[] databaseFile = File.ReadAllLines("userDB.txt");
+                    for (int i = 0; i < databaseFile.Length; i++)
                     {
-                        if (words[i] == (Email))
+                        if (databaseFile[i] == (Email))
                         {
                             if (!Email.Contains("@"))
                             {
                                 break;
                             }
-                            username = words[i - 1];
+                            username = databaseFile[i - 1];
                             email = Email;
                             condition = true;
                             break;
@@ -99,8 +116,6 @@ namespace AuctionMenu
                     if (condition == false)
                     {
                         WriteLine("\tThe supplied value is not a valid email address.");
-
-
                     }
 
                 }
@@ -109,17 +124,7 @@ namespace AuctionMenu
                 //Some while loop that will print errors and re read user input until good password or username is found 
             }
 
-            else if (!File.Exists("userDB.txt"))
-            {
-                WriteLine("\nNo database .txt file, try signing up first");
-                Thread.Sleep(1000);
-                AuctionMainPage auction = new AuctionMainPage();//Includes the front menu
-                auction.Start(@"+------------------------------+
-| Welcome to the Auction House |
-+------------------------------+
-");//Includes registration menu 
 
-            }
 
 
 
