@@ -62,7 +62,7 @@ namespace AuctionMenu
 
             TextWriter EZ = new StreamWriter("userDB.txt", true);
             EZ.WriteLine(userPass);
-            EZ.WriteLine();
+            EZ.WriteLine("");
             EZ.Close();
         }
 

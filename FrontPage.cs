@@ -55,10 +55,10 @@ namespace AuctionMenu
                         lineForEditing = i;
                     }
                 }
-                lineChanger(bid, "userDB.txt", lineForEditing + 7);
-                lineChanger(SignIn.email, "userDB.txt", lineForEditing + 6);
-                lineChanger(SignIn.username, "userDB.txt", lineForEditing + 5);
-
+                lineChanger(bid, "userDB.txt", lineForEditing + 6);
+                lineChanger(SignIn.email, "userDB.txt", lineForEditing + 5);
+                lineChanger(SignIn.username, "userDB.txt", lineForEditing + 4);
+                
 
             }
             void viewPurchased()
@@ -152,9 +152,8 @@ namespace AuctionMenu
                 db.WriteLine("{0}", productDescription);//Write string variable to DB
                 db.WriteLine("{0}", verifiedProductPrice);//Write string variable to DB
                 db.WriteLine("");//Bidder name will go here
-                db.WriteLine("");//Bid amount
-                db.WriteLine("");
-                db.WriteLine("");
+                db.WriteLine("");//Bidder Email will go here
+                db.WriteLine("");//Bidder amount
                 db.WriteLine("");
                 db.Close();
             }
@@ -174,24 +173,26 @@ namespace AuctionMenu
 
                     if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username)
                     {
-                        Write(counter + "\t");
-                        for (int j = 2; j < 8; j++)
+
+                        if (databaseFile[i + 5] == "")
                         {
-                            if (databaseFile[i + j] == "")
+                            Write(counter + "\t");
+                            for (int j = 2; j < 8; j++)
                             {
-                                Write("-\t");
+                                if (databaseFile[i + j] == "")
+                                {
+                                    Write("-\t");
+                                }
+                                Write(databaseFile[i + j] + "\t");
                             }
-                            Write(databaseFile[i + j] + "\t");
+                            Write("\n");
+                            counter++;
                         }
-                        Write("\n");
-                        counter++;
+
+
                     }
 
                 }
-
-
-
-
             }
             void goShopping()
             {
@@ -205,6 +206,7 @@ namespace AuctionMenu
 
                 while (true)
                 {
+                    bool state = false;
                     string[] databaseFile = readDB("userDB.txt");
                     WriteLine("\nPlease supply a search phrase (ALL to see all products)");
                     string shoppingSearch = ReadLine();
@@ -285,17 +287,146 @@ namespace AuctionMenu
                         }
                         break;
                     }
-                    if (databaseFile.Contains(productSearch))
+                    for (int i = 0; i < databaseFile.Length; i++)
                     {
 
+                        if (databaseFile[i] == "For Sale:")
+                        {
+                            for (int j = 0; j < 5; j++)
+                            {
+                                if (databaseFile[j + i].Contains(shoppingSearch))
+                                {
+                                    state = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    state = false;
+                                }
+                            }
+                            if (state == true)
+                            {
+                                WriteLine("\nSearch results\n--------------\n");
+                                WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
+                                int count = 0;
+                                int secondCount = 0;
+
+                                for (int b = 0; b < databaseFile.Length; b++)
+                                {
+                                    if (databaseFile[i] == "For Sale:")
+                                    {
+                                        if (!databaseFile[i + 1].Contains(SignIn.username))
+                                        {
+
+                                            count++;
+                                            if (count != 0)
+                                            {
+                                                Write(count + "\t");
+                                                str[secondCount] = count.ToString();
+
+                                            }
+
+
+                                            for (int j = 2; j < 8; j++)
+                                            {
+
+                                                if (databaseFile[i + j] != "")
+                                                {
+                                                    Write("{0}\t", databaseFile[i + j]);
+
+                                                    str[j - 1 + secondCount] = databaseFile[i + j];
+                                                }
+                                                if (databaseFile[i + j] == "")
+                                                {
+                                                    Write("-\t");
+                                                    str[j - 1 + secondCount] = "-";
+
+                                                }
+
+
+                                            }
+                                            secondCount += 8;
+                                            Write("\n");
+                                            break;
+                                        }
+
+                                    }
+
+                                }
+                                if (count == 0)
+                                {
+                                    WriteLine("\nNothing for sale");
+                                    break;
+                                }
+
+                                WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
+                                string YesOrNoBid = ReadLine();
+                                if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
+                                {
+                                    WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
+                                    string answer4 = ReadLine();
+
+                                    for (int a = 0; a < databaseFile.Length; a++)
+                                    {
+                                        if (answer4 == str[a])
+                                        {
+                                            WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a + 1], str[a + 3], str[a + 5]);
+                                            WriteLine("\nHow much do you bid?");
+                                            string bidAmount = ReadLine();
+                                            productName = str[a + 1];
+                                            updateBid(bidAmount);
+                                            WriteLine("\nYour bid of {0} for {1} has been placed", bidAmount, productName);
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+
+                        }
+
                     }
+                    break;
                 }
-
-
             }
             void viewBids()
             {
-                string[] checkForBid = File.ReadAllLines("userDB.txt");
+
+                //Check iF bro is broke and isnt advertising
+                WriteLine("Product List for {0}({1})", SignIn.username, SignIn.email);
+                string anotherUnderline = "Product List for {0}({1})";
+                int lengthOfUnderline = anotherUnderline.Length + SignIn.email.Length + SignIn.username.Length - 6;
+                lineUnderliner(lengthOfUnderline);
+                WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
+                int counter = 1;
+                string[] databaseFile = readDB("userDB.txt");
+                for (int i = 0; i < databaseFile.Length; i++)
+                {
+
+                    if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username)
+                    {
+
+                        if (databaseFile[i + 5] != "")
+                        {
+                            Write(counter + "\t");
+                            for (int j = 2; j < 8; j++)
+                            {
+                                if (databaseFile[i + j] == "")
+                                {
+                                    Write("-\t");
+                                }
+                                Write(databaseFile[i + j] + "\t");
+                            }
+                            Write("\n");
+                            counter++;
+                        }
+
+
+                    }
+
+                }
+
+
+
 
             }
 
