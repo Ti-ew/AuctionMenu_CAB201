@@ -77,7 +77,7 @@ namespace AuctionMenu
             password = ReadLine();
             userPass = password;
             bool state;
-            string patternPass = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!\]\[\(\):%*?&])[A-Za-z\d@$!\]\[\(\):%*?&]{8,}$";
+            string patternPass = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!\]\[\|().=+\\?,_*~;`@;/""^\-'#<>}{:%*?&])[A-Za-z\d@$!\]\[\|().=+\\?,_*~;`@;/""^\-'#<>}{:%*?&]{8,}$";
             var regexPass = new Regex(patternPass, RegexOptions.IgnoreCase);
             state = regexPass.IsMatch(password);
             if (state == true)

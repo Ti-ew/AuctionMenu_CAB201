@@ -28,7 +28,7 @@ namespace AuctionMenu
             checkIfEmailLoginExists(email);
 
 
-            WriteLine("\nPlease enter your password");
+            
             checkIfPassExists(password);
 
         }
@@ -38,42 +38,41 @@ namespace AuctionMenu
             if (!File.Exists("userDB.txt"))
             {
                 flag = false;
-                WriteLine("\nNo database .txt file, try signing up first");
+                WriteLine("\nNo database .txt file, try signing up first\n");
                 return;
             }
         }
 
         public void checkIfPassExists(string Pass)
         {
-            Pass = ReadLine();
-            bool condition = false;
-            string[] databaseFile = File.ReadAllLines("userDB.txt");
-
-
-            for (int i = 0; i < databaseFile.Length; i++)
+            while (true)
             {
-                if (databaseFile[i] == (Pass) && databaseFile[i - 1] == (email))
+                WriteLine("\nPlease enter your password");
+                password = ReadLine();
+                bool condition = false;
+                string[] databaseFile = File.ReadAllLines("userDB.txt");
+
+
+                for (int i = 0; i < databaseFile.Length; i++)
+                {
+                    if (databaseFile[i] == (password) && databaseFile[i - 1] == (email))
+                    {
+
+                        condition = true;
+                        break;
+                    }
+                    else
+                    {
+                        condition = false;
+                    }
+                }
+                if (condition == true)
                 {
 
-                    condition = true;
-                    break;
+                    return;
+
                 }
-                else
-                {
-                    condition = false;
-                }
-            }
-            if (condition == true)
-            {
-
-                return;
-
-            }
-            if (condition == false)
-            {
-                WriteLine("\nIncorrect password for given email");
-
-                checkIfPassExists(Pass);
+                break;
             }
 
             //Some while loop that will print errors and re read user input until good password or username is found 

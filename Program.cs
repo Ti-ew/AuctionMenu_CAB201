@@ -22,15 +22,18 @@ namespace Program
             {
                 AuctionMainPage auction = new AuctionMainPage();//Includes the front menu
                 auction.Start(prompt);//Includes registration menu (looped to send user back to front menu)
-                //Exit of this first menu is done by loggin in successfully
+                                      //Exit of this first menu is done by loggin in successfully
 
                 //Other page Start functions here
+                if (File.Exists("userDB.txt"))
+                {
+                    FrontPage frontPage = new FrontPage();//First page passed signing up && || logging in
+                    frontPage.Start();//Begin to check if address has been already input or not
+                    prompt = "";
+                }
 
-                FrontPage frontPage = new FrontPage();//First page passed signing up && || logging in
-                frontPage.Start();//Begin to check if address has been already input or not
-                prompt = "";
-                
-                
+
+
             }
 
 
