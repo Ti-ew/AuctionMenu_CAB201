@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using static System.Console;
 
 namespace AuctionMenu
@@ -16,7 +8,73 @@ namespace AuctionMenu
         string homeAddy;
         string productName;
         int secondCount = 0;
-        string[] str = File.ReadAllLines("userDB.txt");
+
+        string[] viewAlphabet(string[] arrayToSort, string[] dbFile)
+        {
+            int iterator = 1;
+
+
+            for (int c = 3; c < dbFile.Length; c++)
+            {
+
+                if (dbFile[c - 3] == "For Sale:" && dbFile[c - 2] == SignIn.username)
+                {
+                    arrayToSort[iterator] = dbFile[c];
+                    iterator++;
+
+                }
+
+            }
+            Array.Sort(arrayToSort, StringComparer.Ordinal);
+
+            return arrayToSort;
+        }
+        string[] arrayAlphabetSpecificSearch(string[] arrayToSort, string[] dbFile, string search)
+        {
+            int iterator = 1;
+
+
+            for (int c = 3; c < dbFile.Length; c++)
+            {
+
+                if (dbFile[c].Contains(search) == true && dbFile[c - 3] == "For Sale:")
+                {
+                    arrayToSort[iterator] = dbFile[c];
+                    iterator++;
+
+                }
+
+            }
+            Array.Sort(arrayToSort, StringComparer.Ordinal);
+
+            return arrayToSort;
+        }
+        string[] arrayAlphabet(string[] arrayToSort, string[] dbFile)
+        {
+            int iterator = 0;
+
+
+            for (int c = 0; c < dbFile.Length - 3; c++)
+            {
+
+                if (dbFile[c] == "For Sale:")
+                {
+                    arrayToSort[iterator] = dbFile[c + 3];
+
+                }
+                iterator++;
+            }
+            Array.Sort(arrayToSort, StringComparer.Ordinal);
+
+            return arrayToSort;
+        }
+
+        string[] createArray(string DB)
+        {
+            string[] databaseFile = readDB(DB);
+            string[] emptyArray = new string[databaseFile.Length + 1];
+            return emptyArray;
+        }
 
         string[] readDB(string DB)
         {
@@ -35,9 +93,9 @@ namespace AuctionMenu
                     lineForEditing = i;
                 }
             }
-            lineChanger(SignIn.username, "userDB.txt", lineForEditing + 5);
-            lineChanger(SignIn.email, "userDB.txt", lineForEditing + 6);
-            lineChanger(bid, "userDB.txt", lineForEditing + 7);
+            lineChanger(SignIn.username, "userDB.txt", lineForEditing + 4);
+            lineChanger(SignIn.email, "userDB.txt", lineForEditing + 5);
+            lineChanger(bid, "userDB.txt", lineForEditing + 6);
 
 
 
@@ -68,60 +126,71 @@ namespace AuctionMenu
             string[] databaseFile = readDB("userDB.txt");
             if (searchPhrase == "ALL" || searchPhrase == "all")
             {
+
                 WriteLine("\nSearch results\n--------------\n");
                 WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
                 int count = 0;
-
-
-                for (int i = 0; i < databaseFile.Length; i++)
+                string[] str = createArray("userDB.txt");
+                string[] sortedArray = createArray("userDB.txt");
+                arrayAlphabet(sortedArray, databaseFile);
+                sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
+                while (true)
                 {
-                    if (databaseFile[i] == "For Sale:")
+                    for (int i = 0; i < databaseFile.Length - 3; i++)
                     {
-                        if (!databaseFile[i + 1].Contains(SignIn.username))
+
+                        if (databaseFile[i + 3] == sortedArray[count])
                         {
-
-                            count++;
-                            if (count != 0)
+                            if (!databaseFile[i + 1].Contains(SignIn.username))
                             {
-                                Write(count + "\t");
-                                str[secondCount] = count.ToString();
-
-                            }
-
-
-                            for (int j = 3; j < 9; j++)
-                            {
-
-                                if (databaseFile[i + j] != "")
+                                //Printing table for search result ALL
+                                count++;//Table is working therefore lets start at index 1
+                                if (count != 0)
                                 {
-                                    Write("{0}\t", databaseFile[i + j]);
-
-                                    str[j - 1 + secondCount] = databaseFile[i + j];
-                                }
-                                if (databaseFile[i + j] == "")
-                                {
-                                    Write("-\t");
-                                    str[j - 1 + secondCount] = "-";
+                                    Write(count + "\t");//Print the number
+                                    str[secondCount + 1] = count.ToString();//Print the number to an array of string to choose from
 
                                 }
 
+                                //for the next 6 iterations after 3, print the following
+                                for (int j = 3; j < 9; j++)
+                                {
+
+                                    if (databaseFile[i + j] != "")
+                                    {
+                                        Write("{0}\t", databaseFile[i + j]);
+
+                                        str[j - 1 + secondCount] = databaseFile[i + j];
+                                    }
+                                    if (databaseFile[i + j] == "")
+                                    {
+                                        Write("-\t");
+                                        str[j - 1 + secondCount] = "-";
+
+                                    }
+
+
+                                }
+                                secondCount += 8;
+                                Write("\n");
 
                             }
-                            secondCount += 8;
-                            Write("\n");
 
                         }
 
                     }
+                    if (count == 0)
+                    {
+                        WriteLine("\nNothing for sale");
+                        return;
 
+                    }
+
+                    if (count == sortedArray.Length)
+                    {
+                        break;
+                    }
                 }
-                if (count == 0)
-                {
-                    WriteLine("\nNothing for sale");
-                    return;
-
-                }
-
                 WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
                 string YesOrNoBid = ReadLine();
                 if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
@@ -133,7 +202,12 @@ namespace AuctionMenu
                     {
                         if (answer4 == str[a])
                         {
-                            WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a + 1], str[a + 4], str[a + 6]);
+                            WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a + 1], str[a + 3], str[a + 6]);
+                            //Bid amount check. NO BROKEY'S
+
+
+
+
                             WriteLine("\nHow much do you bid?");
                             string bidAmount = ReadLine();
                             productName = str[a + 1];
@@ -264,12 +338,14 @@ namespace AuctionMenu
 
                 }
 
-            }
+            }//Alot of stuff to do. Print the "For Sale:" items to the screen
             for (int i = 0; i < databaseFile.Length; i++)
             {
 
                 if (databaseFile[i] == "For Sale:")
                 {
+
+
                     for (int j = 0; j < 5; j++)
                     {
                         if (databaseFile[j + i].Contains(searchPhrase))
@@ -282,20 +358,30 @@ namespace AuctionMenu
                             state = false;
                         }
                     }
+
+
+
                     if (state == true)
                     {
                         WriteLine("\nSearch results\n--------------\n");
                         WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
                         int count = 0;
 
+                        string[] str = createArray("userDB.txt");
+                        string[] sortedArray = createArray("userDB.txt");
+                        arrayAlphabetSpecificSearch(sortedArray, databaseFile, searchPhrase);
+                        sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
 
-                        for (int b = 0; b < databaseFile.Length; b++)
+                        while (true)
                         {
-                            if (databaseFile[i] == "For Sale:")
+                            for (int b = 0; b < databaseFile.Length - 3; b++)
                             {
-                                if (!databaseFile[i + 1].Contains(SignIn.username))
+                                if (count == sortedArray.Length)
                                 {
-
+                                    break;
+                                }
+                                if (databaseFile[b + 3] == sortedArray[count])
+                                {
                                     count++;
                                     if (count != 0)
                                     {
@@ -303,18 +389,16 @@ namespace AuctionMenu
                                         str[secondCount] = count.ToString();
 
                                     }
-
-
                                     for (int j = 3; j < 9; j++)
                                     {
 
-                                        if (databaseFile[i + j] != "")
+                                        if (databaseFile[b + j] != "")
                                         {
-                                            Write("{0}\t", databaseFile[i + j]);
+                                            Write("{0}\t", databaseFile[b + j]);
 
-                                            str[j - 1 + secondCount] = databaseFile[i + j];
+                                            str[j - 1 + secondCount] = databaseFile[b + j];
                                         }
-                                        if (databaseFile[i + j] == "")
+                                        if (databaseFile[b + j] == "")
                                         {
                                             Write("-\t");
                                             str[j - 1 + secondCount] = "-";
@@ -326,18 +410,22 @@ namespace AuctionMenu
                                     secondCount += 8;
                                     Write("\n");
 
-                                    break;
+
                                 }
 
+
+                            }
+                            if (count == sortedArray.Length)
+                            {
+                                break;
                             }
 
+                            if (count == 0)
+                            {
+                                WriteLine("\nNothing for sale");
+                                break;
+                            }
                         }
-                        if (count == 0)
-                        {
-                            WriteLine("\nNothing for sale");
-                            break;
-                        }
-
                         WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
                         string YesOrNoBid = ReadLine();
                         if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
@@ -481,9 +569,10 @@ namespace AuctionMenu
                         break;
                     }
 
+
                 }
 
-            }
+            }//Alot of stuff to do. Print the "For Sale:" items to the screen if a specific match is found within its Name or Description
         }
         static void lineUnderliner(int stringLength)
         {
@@ -590,20 +679,26 @@ namespace AuctionMenu
 
                 //Check iF bro is broke and isnt advertising
                 WriteLine("Product List for {0}({1})", SignIn.username, SignIn.email);
+                WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
+
                 string anotherUnderline = "Product List for {0}({1})";
                 int lengthOfUnderline = anotherUnderline.Length + SignIn.email.Length + SignIn.username.Length - 6;
                 lineUnderliner(lengthOfUnderline);
-                WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
-                int counter = 1;
-                string[] databaseFile = readDB("userDB.txt");
-                for (int i = 0; i < databaseFile.Length; i++)
-                {
 
-                    if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username)
+                int counter = 0;
+                string[] databaseFile = readDB("userDB.txt");
+                string[] sortedArray = createArray("userDB.txt");
+                viewAlphabet(sortedArray, databaseFile);
+                sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
+
+                while (true)
+                {
+                    for (int i = 0; i < databaseFile.Length; i++)
                     {
 
-                        if (databaseFile[i + 6] == "")
+                        if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username && databaseFile[i + 3] == sortedArray[counter])
                         {
+                            counter++;
                             Write(counter + "\t");
                             for (int j = 3; j < 9; j++)
                             {
@@ -614,27 +709,37 @@ namespace AuctionMenu
                                 Write(databaseFile[i + j] + "\t");
                             }
                             Write("\n");
-                            counter++;
+
+
                         }
 
-
                     }
-
+                    if (counter == sortedArray.Length)
+                    {
+                        break;
+                    }
                 }
             }
             void goShopping()
             {
+                //Time to place some bids.
                 WriteLine("\nProduct search for {0}({1})", SignIn.username, SignIn.email);
                 string productSearch = "Product search for {0}({1)";
                 int productSearchLen = productSearch.Length + SignIn.username.Length + SignIn.email.Length - 6;
                 lineUnderliner(productSearchLen);
                 while (true)
                 {
-
+                    //Lets begin, first open up a databaseFile, recalling it as changes may have been made.
                     string[] databaseFile = readDB("userDB.txt");
+
                     WriteLine("\nPlease supply a search phrase (ALL to see all products)");
+                    //Use this readLine as a way of comparing to the databaseFile if a search is given
+                    //IF not continue to display all "For Sale:" items
                     string shoppingSearch = ReadLine();
                     beginSearch(shoppingSearch);
+                    //Somewhere in begin search im going to get all the strings of the "For Sale:" products
+                    //Order them
+                    //Tell the search team to look for the first string in the ordered array
                     break;
                 }
             }
@@ -815,6 +920,7 @@ namespace AuctionMenu
                             else
                             {
                                 Console.WriteLine("     Select a state from the following\n");
+
                             }
                         }
                         Write("\n");
@@ -856,15 +962,14 @@ namespace AuctionMenu
                 }
                 while (true)
                 {
-                    string[] options = { "(1) Advertise product", "(2) View my product list", "(3) Search for advertised products", "(4) View bids on my products", "(5) View my purchased items", "(6) Log off" };
+                    string[] options = { "(1) Advertise product", "(2) View my product list", "(3) Search for advertised products", "(4) View bids on my products", "(5) View my purchased items", "(6) Log off\n" };
                     WriteLine("\nClient Menu\r\n-----------");
                     for (int i = 0; i < options.Length; i++)
                     {
                         string currentOption = options[i];
                         WriteLine($"{currentOption}");
                     }
-
-
+                    WriteLine("Please select an option between 1 and 6");
                     string[] validvalues = new string[] { "1", "2", "3", "4", "5", "6" };
                     string mystring = "";
                     mystring = ReadLine();

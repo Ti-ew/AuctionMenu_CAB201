@@ -32,7 +32,8 @@ namespace Program
                     prompt = "";
                 }
 
-
+                //NOTE: the .txt file working directory is located 
+                // \AuctionMenu\AuctionMenu\bin\Debug\net6.0
 
             }
 
