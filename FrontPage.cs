@@ -147,11 +147,12 @@ namespace AuctionMenu
         {
             bool state = false;
             string[] databaseFile = readDB("userDB.txt");
+            WriteLine("\nSearch results\n--------------\n");
+            WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
             if (searchPhrase == "ALL" || searchPhrase == "all")
             {
 
-                WriteLine("\nSearch results\n--------------\n");
-                WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
+
                 int count = 0;
                 string[] str = createArray("userDB.txt");
                 string[] sortedArray = createArray("userDB.txt");
@@ -376,245 +377,228 @@ namespace AuctionMenu
                 }
 
             }//Alot of stuff to do. Print the "For Sale:" items to the screen
+
+
             for (int i = 0; i < databaseFile.Length; i++)
             {
 
-                if (databaseFile[i] == "For Sale:")
+                if (databaseFile[i] == "For Sale:" && databaseFile[i + 3].Contains(searchPhrase) == true)
                 {
 
 
-                    for (int j = 0; j < 5; j++)
+                    int count = 0;
+
+                    string[] str = createArray("userDB.txt");
+                    string[] sortedArray = createArray("userDB.txt");
+                    arrayAlphabetSpecificSearch(sortedArray, databaseFile, searchPhrase);
+                    sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
+
+                    while (true)
                     {
-                        if (databaseFile[j + i].Contains(searchPhrase))
+                        for (int b = 0; b < databaseFile.Length - 3; b++)
                         {
-                            state = true;
-                            break;
-                        }
-                        else
-                        {
-                            state = false;
-                        }
-                    }
-
-
-
-                    if (state == true)
-                    {
-                        WriteLine("\nSearch results\n--------------\n");
-                        WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
-                        int count = 0;
-
-                        string[] str = createArray("userDB.txt");
-                        string[] sortedArray = createArray("userDB.txt");
-                        arrayAlphabetSpecificSearch(sortedArray, databaseFile, searchPhrase);
-                        sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
-
-                        while (true)
-                        {
-                            for (int b = 0; b < databaseFile.Length - 3; b++)
-                            {
-                                if (count == sortedArray.Length)
-                                {
-                                    break;
-                                }
-                                if (databaseFile[b + 3] == sortedArray[count])
-                                {
-                                    count++;
-                                    if (count != 0)
-                                    {
-                                        Write(count + "\t");
-                                        str[secondCount] = count.ToString();
-
-                                    }
-                                    for (int j = 3; j < 9; j++)
-                                    {
-
-                                        if (databaseFile[b + j] != "")
-                                        {
-                                            Write("{0}\t", databaseFile[b + j]);
-
-                                            str[j - 1 + secondCount] = databaseFile[b + j];
-                                        }
-                                        if (databaseFile[b + j] == "")
-                                        {
-                                            Write("-\t");
-                                            str[j - 1 + secondCount] = "-";
-
-                                        }
-
-
-                                    }
-                                    secondCount += 8;
-                                    Write("\n");
-
-
-                                }
-
-
-                            }
                             if (count == sortedArray.Length)
                             {
                                 break;
                             }
-
-                            if (count == 0)
+                            if (databaseFile[b + 3] == sortedArray[count])
                             {
-                                WriteLine("\nNothing for sale");
+                                count++;
+                                if (count != 0)
+                                {
+                                    Write(count + "\t");
+                                    str[secondCount] = count.ToString();
+
+                                }
+                                for (int j = 3; j < 9; j++)
+                                {
+
+                                    if (databaseFile[b + j] != "")
+                                    {
+                                        Write("{0}\t", databaseFile[b + j]);
+
+                                        str[j - 1 + secondCount] = databaseFile[b + j];
+                                    }
+                                    if (databaseFile[b + j] == "")
+                                    {
+                                        Write("-\t");
+                                        str[j - 1 + secondCount] = "-";
+
+                                    }
+
+
+                                }
+                                secondCount += 8;
+                                Write("\n");
+
+
+                            }
+
+
+                        }
+                        if (count == sortedArray.Length)
+                        {
+                            break;
+                        }
+
+                        if (count == 0)
+                        {
+                            WriteLine("\nNothing for sale");
+                            break;
+                        }
+                    }
+                    WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
+                    Write("> ");
+                    string YesOrNoBid = ReadLine();
+                    if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
+                    {
+                        WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
+                        Write("> ");
+                        string answer4 = ReadLine();
+
+                        for (int a = 0; a < databaseFile.Length; a++)
+                        {
+                            if (answer4 == str[a])
+                            {
+                                WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a + 2], str[a + 4], str[a + 5]);
+                                WriteLine("\nHow much do you bid?");
+                                Write("> ");
+                                string bidAmount = ReadLine();
+                                productName = str[a + 1];
+                                updateBid(bidAmount);
+                                WriteLine("\nYour bid of {0} for {1} has been placed\n", bidAmount, productName);
                                 break;
                             }
                         }
-                        WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
-                        Write("> ");
-                        string YesOrNoBid = ReadLine();
-                        if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
+                        WriteLine("Delivery Instructions\n---------------------");
+                        Write("(1) Click and collect\n");
+                        Write("(2) Home Delivery\n");
+                        while (true)
                         {
-                            WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
                             Write("> ");
-                            string answer4 = ReadLine();
-
-                            for (int a = 0; a < databaseFile.Length; a++)
+                            string deliveryOption = ReadLine();
+                            if (deliveryOption == "1")
                             {
-                                if (answer4 == str[a])
-                                {
-                                    WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a + 2], str[a + 4], str[a + 5]);
-                                    WriteLine("\nHow much do you bid?");
-                                    Write("> ");
-                                    string bidAmount = ReadLine();
-                                    productName = str[a + 1];
-                                    updateBid(bidAmount);
-                                    WriteLine("\nYour bid of {0} for {1} has been placed\n", bidAmount, productName);
-                                    break;
-                                }
+
                             }
-                            WriteLine("Delivery Instructions\n---------------------");
-                            Write("(1) Click and collect\n");
-                            Write("(2) Home Delivery\n");
-                            while (true)
+                            if (deliveryOption == "2")
                             {
+                                //Home delivery stuff
+                                while (true)
+                                {
+
+                                    Console.WriteLine("\nUnit number  (0 = none):");
+                                    var input = Console.ReadLine();
+
+
+                                    if (int.TryParse(input, out var value) && value > 0)
+                                    {
+                                        homeAddy += input + "/";
+                                        break;
+                                    }
+                                    if (int.TryParse(input, out var bruh) && bruh == 0)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("     Unit number must be a non-negative integer.\n");
+                                    }
+                                }
+                                Write("\n");
+                                //First barrier of correct input
+
+                                while (true)
+                                {
+
+                                    WriteLine("Street number:");
+                                    Write("> ");
+                                    var streetNum = Console.ReadLine();
+
+                                    if (int.TryParse(streetNum, out var value) && 0 < value)
+                                    {
+                                        homeAddy += streetNum + " ";
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("     Street number must be a positive integer.\n");
+                                    }
+                                }
+                                Write("\n");
+                                WriteLine("Street name:");
                                 Write("> ");
-                                string deliveryOption = ReadLine();
-                                if (deliveryOption == "1")
+                                string streetName = Console.ReadLine();
+                                homeAddy += streetName + " ";
+                                Write("\n");
+                                //No barrier needed
+
+                                WriteLine("Street suffix:");
+                                Write("> ");
+                                string streetSuffix = Console.ReadLine();
+                                homeAddy += streetSuffix + ", ";
+                                Write("\n");
+                                //No barrier needed
+
+                                WriteLine("City:");
+                                Write("> ");
+                                string city = Console.ReadLine();
+                                homeAddy += city + " ";
+                                Write("\n");
+                                //No barrier needed
+                                string[] values = { "ACT", "act", "NSW", "nsw", "NT", "nt", "QLD", "qld", "SA", "sa", "TAS", "tas", "VIC", "vic", "WA", "wa" };
+                                string deliveryState;
+                                while (true)
+                                {
+                                    WriteLine("State (ACT, NSW, NT, QLD, SA, TAS, VIC, WA):");
+                                    Write("> ");
+                                    deliveryState = Console.ReadLine();
+
+                                    if (values.Contains(deliveryState))
+                                    {
+                                        homeAddy += deliveryState + " ";
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("     Select a state from the following\n");
+                                    }
+                                }
+                                Write("\n");
+                                //Barrier for enetering a correct state type
+
+
+                                while (true)
                                 {
 
+                                    Console.WriteLine("Postcode  (1000 - 9999):");
+                                    Write("> ");
+                                    var postcode = Console.ReadLine();
+
+
+                                    if (int.TryParse(postcode, out var value) && value >= 1000 && value <= 9999)
+                                    {
+                                        homeAddy += postcode + " ";
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("     Invalid postcode.\n");
+                                    }
                                 }
-                                if (deliveryOption == "2")
-                                {
-                                    //Home delivery stuff
-                                    while (true)
-                                    {
+                                Write("\n");
+                                //Barrier for postcode
 
-                                        Console.WriteLine("\nUnit number  (0 = none):");
-                                        var input = Console.ReadLine();
+                                WriteLine("Thank you for your bid. If successful, the item will be provided via delivery to {0}", homeAddy);
+                                //update userDB with delivery address
+                                updateUserDBDelivery(homeAddy);
+                                break;
 
-
-                                        if (int.TryParse(input, out var value) && value > 0)
-                                        {
-                                            homeAddy += input + "/";
-                                            break;
-                                        }
-                                        if (int.TryParse(input, out var bruh) && bruh == 0)
-                                        {
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("     Unit number must be a non-negative integer.\n");
-                                        }
-                                    }
-                                    Write("\n");
-                                    //First barrier of correct input
-
-                                    while (true)
-                                    {
-
-                                        WriteLine("Street number:");
-                                        Write("> ");
-                                        var streetNum = Console.ReadLine();
-
-                                        if (int.TryParse(streetNum, out var value) && 0 < value)
-                                        {
-                                            homeAddy += streetNum + " ";
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("     Street number must be a positive integer.\n");
-                                        }
-                                    }
-                                    Write("\n");
-                                    WriteLine("Street name:");
-                                    Write("> ");
-                                    string streetName = Console.ReadLine();
-                                    homeAddy += streetName + " ";
-                                    Write("\n");
-                                    //No barrier needed
-
-                                    WriteLine("Street suffix:");
-                                    Write("> ");
-                                    string streetSuffix = Console.ReadLine();
-                                    homeAddy += streetSuffix + ", ";
-                                    Write("\n");
-                                    //No barrier needed
-
-                                    WriteLine("City:");
-                                    Write("> ");
-                                    string city = Console.ReadLine();
-                                    homeAddy += city + " ";
-                                    Write("\n");
-                                    //No barrier needed
-                                    string[] values = { "ACT", "act", "NSW", "nsw", "NT", "nt", "QLD", "qld", "SA", "sa", "TAS", "tas", "VIC", "vic", "WA", "wa" };
-                                    string deliveryState;
-                                    while (true)
-                                    {
-                                        WriteLine("State (ACT, NSW, NT, QLD, SA, TAS, VIC, WA):");
-                                        Write("> ");
-                                        deliveryState = Console.ReadLine();
-
-                                        if (values.Contains(deliveryState))
-                                        {
-                                            homeAddy += deliveryState + " ";
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("     Select a state from the following\n");
-                                        }
-                                    }
-                                    Write("\n");
-                                    //Barrier for enetering a correct state type
-
-
-                                    while (true)
-                                    {
-
-                                        Console.WriteLine("Postcode  (1000 - 9999):");
-                                        Write("> ");
-                                        var postcode = Console.ReadLine();
-
-
-                                        if (int.TryParse(postcode, out var value) && value >= 1000 && value <= 9999)
-                                        {
-                                            homeAddy += postcode + " ";
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("     Invalid postcode.\n");
-                                        }
-                                    }
-                                    Write("\n");
-                                    //Barrier for postcode
-
-                                    WriteLine("Thank you for your bid. If successful, the item will be provided via delivery to {0}", homeAddy);
-                                    //update userDB with delivery address
-                                    updateUserDBDelivery(homeAddy);
-                                    break;
-
-                                }
                             }
                         }
-                        break;
                     }
+                    break;
+
 
 
                 }

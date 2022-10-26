@@ -89,11 +89,7 @@ namespace AuctionMenu
                 while (true)
                 {
                     WriteLine("\nPlease enter your email address");
-
-
-
-
-
+                    Write("> ");
                     Email = ReadLine();
                     string[] databaseFile = File.ReadAllLines("userDB.txt");
                     for (int i = 0; i < databaseFile.Length; i++)

@@ -74,6 +74,7 @@ namespace AuctionMenu
             WriteLine("* At least one lowercase letter");
             WriteLine("* At least one digit");
             WriteLine("* At least one special character");
+            Write("> ");
             password = ReadLine();
             userPass = password;
             bool state;
@@ -97,6 +98,7 @@ namespace AuctionMenu
             while (true)
             {
                 WriteLine("\nPlease enter your name");//Ask user for name
+                Write("> ");
                 Name = ReadLine();
                 if (!Name.Contains("@"))
                 {
@@ -115,7 +117,7 @@ namespace AuctionMenu
 
         public void checkIfEmailExists(string Email)
         {
-
+            Write("> ");
             Email = ReadLine();
             userEmail = Email;
             if (!IsValidEmail(Email))
