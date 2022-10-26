@@ -24,31 +24,36 @@ namespace AuctionMenu
             string[] validValues = new string[] { "1", "2", "3" };
             string myString = "";
             WriteLine("\nPlease select an option between 1 and 3");
-            while (!validValues.Any(myString.Equals))
+
+            while (true)
+            {
+                Write("> ");
                 myString = ReadLine();
-            if (myString == validValues[0])
-            {
-                Registration registration = new Registration();
-                registration.userSignUp();
-                
+                if (myString == validValues[0])
+                {
+                    Registration registration = new Registration();
+                    registration.userSignUp();
+                    break;
+
+
+                }
+
+                if (myString == validValues[1])
+                {
+
+                    SignIn signIn = new SignIn();
+                    signIn.userSignIn();
+                    break;
+
+                }
+                if (myString == validValues[2])
+                {
+                    WriteLine("+--------------------------------------------------+\r\n| Good bye, thank you for using the Auction House! |\r\n+--------------------------------------------------+");
+                    System.Environment.Exit(1);
+                }
+
 
             }
-
-            if (myString == validValues[1])
-            {
-
-                SignIn signIn = new SignIn();
-                signIn.userSignIn();
-
-            }
-            if (myString == validValues[2])
-            {
-                WriteLine("+--------------------------------------------------+\r\n| Good bye, thank you for using the Auction House! |\r\n+--------------------------------------------------+");
-                System.Environment.Exit(1);
-            }
-
-
-
         }
     }
 }

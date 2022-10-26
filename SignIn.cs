@@ -28,7 +28,7 @@ namespace AuctionMenu
             checkIfEmailLoginExists(email);
 
 
-            
+
             checkIfPassExists(password);
 
         }
@@ -48,6 +48,7 @@ namespace AuctionMenu
             while (true)
             {
                 WriteLine("\nPlease enter your password");
+                Write("> ");
                 password = ReadLine();
                 bool condition = false;
                 string[] databaseFile = File.ReadAllLines("userDB.txt");
@@ -88,6 +89,11 @@ namespace AuctionMenu
                 while (true)
                 {
                     WriteLine("\nPlease enter your email address");
+
+
+
+
+
                     Email = ReadLine();
                     string[] databaseFile = File.ReadAllLines("userDB.txt");
                     for (int i = 0; i < databaseFile.Length; i++)
