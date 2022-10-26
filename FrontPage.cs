@@ -59,7 +59,7 @@ namespace AuctionMenu
             for (int c = 0; c < dbFile.Length - 3; c++)
             {
 
-                if (dbFile[c] == "For Sale:")
+                if (dbFile[c] == "For Sale:" && dbFile[c + 1] != SignIn.username)
                 {
                     arrayToSort[iterator] = dbFile[c + 3];
 
@@ -145,7 +145,7 @@ namespace AuctionMenu
 
         void beginSearch(string searchPhrase)
         {
-            bool state = false;
+
             string[] databaseFile = readDB("userDB.txt");
             WriteLine("\nSearch results\n--------------\n");
             WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
@@ -163,7 +163,7 @@ namespace AuctionMenu
                     for (int i = 0; i < databaseFile.Length - 3; i++)
                     {
 
-                        if (databaseFile[i + 3] == sortedArray[count] && databaseFile[i + 1] != SignIn.username)
+                        if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] != SignIn.username && databaseFile[i + 3] == sortedArray[count])
                         {
 
                             //Printing table for search result ALL
@@ -204,12 +204,6 @@ namespace AuctionMenu
                         {
                             break;
                         }
-
-                    }
-                    if (count == 0)
-                    {
-                        WriteLine("\nNothing for sale");
-                        return;
 
                     }
 
