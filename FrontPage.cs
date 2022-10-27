@@ -1,5 +1,6 @@
 using static System.Console;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace AuctionMenu
 {
@@ -9,7 +10,119 @@ namespace AuctionMenu
         string homeAddy;
         string productName;
 
-        public static string RemoveNonNumeric(string s)
+		public string[] RemoveDuplicates(string[] myList)
+		{
+			System.Collections.ArrayList newList = new System.Collections.ArrayList();
+
+			foreach (string str in myList)
+				if (!newList.Contains(str))
+					newList.Add(str);
+			return (string[])newList.ToArray(typeof(string));
+		}
+		string convert24to12(string time, string minutes)
+        {
+
+			//if the strings first letter is a 0, delete it
+			char[] charArr = time.ToCharArray();
+            if (charArr[0] == '0' && charArr[1] == '0')
+            {
+				time = time.Replace('0', ' ');				
+				time = time.Replace(' ', '1');
+				time = time.Remove(1,1);
+				time = time + " AM";
+			}
+			if (charArr[0] == '0')
+            {
+				//remove the 0
+				time = time.Remove(0, 1);
+                time = time + ":" + minutes + " AM";
+			}
+            if (charArr[0] == '1' && charArr[1] == '0')
+            {				
+				time = time + ":" + minutes + " AM";
+			}
+            if (charArr[0] == '1' && charArr[1] == '1')
+            {
+				time = time + ":" + minutes + " AM";
+			}
+			if (charArr[0] == '1' && charArr[1] == '2')
+			{				
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '1' && charArr[1] == '3')
+			{
+                //remove the 1
+                time = time.Remove(1, 1);
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '1' && charArr[1] == '4')
+			{
+                time = time.Replace('1', '2');
+                time = time.Remove(1, 1);
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '1' && charArr[1] == '5')
+			{
+				time = time.Replace('1', '3');
+				time = time.Remove(1, 1);
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '1' && charArr[1] == '6')
+			{
+				time = time.Replace('1', '4');
+				time = time.Remove(1, 1);
+				time = time + ":" + minutes + " PM";
+			}
+            if (charArr[0] == '1' && charArr[1] == '7')
+            {
+                time = time.Replace('1', '5');
+                time = time.Remove(1, 1);
+                time = time + ":" + minutes + " PM";
+            }			
+			if (charArr[0] == '1' && charArr[1] == '8')
+			{
+				time = time.Replace('1', '6');
+				time = time.Remove(1, 1);
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '1' && charArr[1] == '9')
+			{
+				time = time.Replace('1', '7');
+				time = time.Remove(1, 1);
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '2' && charArr[1] == '0')
+			{
+				time = time.Replace('2', '8');
+				time = time.Remove(1, 1);
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '2' && charArr[1] == '1')
+			{
+				time = time.Replace('2', '9');
+				time = time.Remove(1, 1);
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '2' && charArr[1] == '2')
+			{
+				time = time.Replace('2', ' ');
+				time = time.Replace('2', ' ');
+				time = time.Replace(' ', '1');
+				time = time.Replace(' ', '0');
+				time = time + ":" + minutes + " PM";
+			}
+			if (charArr[0] == '2' && charArr[1] == '3')
+			{
+				time = time.Replace('2', ' ');
+				time = time.Replace('3', ' ');
+				time = time.Replace(' ', '1');
+				time = time.Replace(' ', '1');
+				time = time + ":" + minutes + " PM";
+			}			
+			return time;
+
+		}
+		public static string RemoveNonNumeric(string s)
         {
             return s.Replace("$", "");
         }
@@ -266,7 +379,8 @@ namespace AuctionMenu
                                 }
                                 else 
                                 {
-                                    WriteLine("\tBid amount must be greater than {0}\n", str[a+6]);
+                                    Write("\t");
+                                    WriteLine("Bid amount must be greater than {0}\n", str[a+6]);
 
                                     WriteLine("\nHow much do you bid?");
                                 }
@@ -304,6 +418,8 @@ namespace AuctionMenu
                                 string[] hoursMonths = deliveryWindowStart.Split(' ');
                                 dateMonthStart = hoursMonths[0];
                                 dateHourStart = hoursMonths[1];
+                                string[] dateJustHour = dateMonthStart.Split(':');
+                                dateHourStart = convert24to12(dateJustHour[0], dateJustHour[1]);
                                 DateTime dt1 = DateTime.ParseExact(deliveryWindowStart, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
                                 TimeSpan diff = dt1 - DateTime.Now;
                                 if (diff.TotalHours > 1)
@@ -324,8 +440,10 @@ namespace AuctionMenu
                                 string deliveryWindow = ReadLine();
                                 string[] hoursMonths = deliveryWindow.Split(' ');
                                 dateMonthEnd = hoursMonths[0];
-                                dateHourEnd = hoursMonths[1];
-                                DateTime dt1 = DateTime.ParseExact(deliveryWindow, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+                                dateHourEnd = hoursMonths[1];								
+								string[] dateJustHour = dateMonthEnd.Split(':');
+								dateHourEnd = convert24to12(dateJustHour[0], dateJustHour[1]);
+								DateTime dt1 = DateTime.ParseExact(deliveryWindow, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
                                 if (dt1 > DateTime.Now && dt1 > dt2)
                                 {
                                     dt3 = dt1;
@@ -469,11 +587,11 @@ namespace AuctionMenu
                     int count = 0;
                     int secondCount = 0;
                     string[] str = createArray("userDB.txt");
-                    string[] sortedArray = createArray("userDB.txt");
+                    var sortedArray = createArray("userDB.txt");
                     arrayAlphabetSpecificSearch(sortedArray, databaseFile, searchPhrase);
                     sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
-
-                    while (true)
+					sortedArray = sortedArray.Distinct().ToArray();
+					while (true)
                     {
                         
                         for (int b = 0; b < databaseFile.Length - 3; b++)
@@ -577,7 +695,8 @@ namespace AuctionMenu
                                     }
                                     else
                                     {
-                                        WriteLine("\tBid amount must be greater than {0}", str[a + 6]);
+                                        Write("\t");
+                                        WriteLine("Bid amount must be greater than {0}", str[a + 6]);
                                         WriteLine("\nHow much do you bid?");
 
                                     }
@@ -613,7 +732,9 @@ namespace AuctionMenu
                                     string[] hoursMonths = deliveryWindowStart.Split(' ');
                                     dateMonthStart = hoursMonths[0];
                                     dateHourStart = hoursMonths[1];
-                                    DateTime dt1 = DateTime.ParseExact(deliveryWindowStart, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+									string[] dateJustHour = dateHourStart.Split(':');
+									dateHourStart = convert24to12(dateJustHour[0], dateJustHour[1]);
+									DateTime dt1 = DateTime.ParseExact(deliveryWindowStart, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
                                     TimeSpan diff = dt1 - DateTime.Now;
                                     if (diff.TotalHours > 1)
                                     {
@@ -634,7 +755,9 @@ namespace AuctionMenu
                                     string[] hoursMonths = deliveryWindow.Split(' ');
                                     dateMonthEnd = hoursMonths[0];
                                     dateHourEnd = hoursMonths[1];
-                                    DateTime dt1 = DateTime.ParseExact(deliveryWindow, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+									string[] dateJustHour = dateHourEnd.Split(':');
+									dateHourEnd = convert24to12(dateJustHour[0], dateJustHour[1]);
+									DateTime dt1 = DateTime.ParseExact(deliveryWindow, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
                                     if (dt1 > DateTime.Now && dt1 > dt2)
                                     {
                                         dt3 = dt1;
@@ -891,8 +1014,8 @@ namespace AuctionMenu
                 string[] sortedArray = createArray("userDB.txt");
                 viewAlphabet(sortedArray, databaseFile);
                 sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
-
-                while (true)
+				sortedArray = sortedArray.Distinct().ToArray();
+				while (true)
                 {
                     for (int i = 0; i < databaseFile.Length; i++)
                     {
@@ -966,7 +1089,8 @@ namespace AuctionMenu
                 string[] sortedArray = createArray("userDB.txt");
                 bidsAlphabet(sortedArray, databaseFile);
                 sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
-                while (true)
+				sortedArray = sortedArray.Distinct().ToArray();
+				while (true)
                 {
                     for (int i = 0; i < databaseFile.Length; i++)
                     {
