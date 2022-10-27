@@ -7,7 +7,7 @@ namespace AuctionMenu
         string addy;
         string homeAddy;
         string productName;
-        int secondCount = 0;
+        
 
         string[] viewAlphabet(string[] arrayToSort, string[] dbFile)
         {
@@ -35,10 +35,18 @@ namespace AuctionMenu
             int iterator = 1;
 
 
-            for (int c = 3; c < dbFile.Length; c++)
+            for (int c = 4; c < dbFile.Length; c++)
             {
+                //Check product name and description for positive .Contains()
+                //Looking for matches in description
+                if (dbFile[c].Contains(search) == true && dbFile[c - 4] == "For Sale:" && dbFile[c - 3] != SignIn.username)
+                {
+                    arrayToSort[iterator] = dbFile[c-1];
+                    iterator++;
 
-                if (dbFile[c].Contains(search) == true && dbFile[c - 3] == "For Sale:")
+                }
+                //Looking for matches in product name
+                if ((dbFile[c].Contains(search) == true && dbFile[c - 3] == "For Sale:" && dbFile[c - 2] != SignIn.username))
                 {
                     arrayToSort[iterator] = dbFile[c];
                     iterator++;
@@ -50,21 +58,24 @@ namespace AuctionMenu
 
             return arrayToSort;
         }
-        //Works but doesnt display enough. Loop issue.
+        //Works
         string[] arrayAlphabetAllSearch(string[] arrayToSort, string[] dbFile)
         {
             int iterator = 0;
 
 
-            for (int c = 0; c < dbFile.Length - 3; c++)
+            for (int c = 3; c < dbFile.Length; c++)
             {
+                //Check product name and description for positive .Contains()
 
-                if (dbFile[c] == "For Sale:" && dbFile[c + 1] != SignIn.username)
+                //Looking for matches in product name
+                if (dbFile[c - 3].Contains("For Sale:") && dbFile[c - 2] != SignIn.username)
                 {
-                    arrayToSort[iterator] = dbFile[c + 3];
+                    arrayToSort[iterator] = dbFile[c];
+                    iterator++;
 
-                }
-                iterator++;
+                }                
+
             }
             Array.Sort(arrayToSort, StringComparer.Ordinal);
 
@@ -73,9 +84,9 @@ namespace AuctionMenu
         //Works
         string[] bidsAlphabet(string[] arrayToSort, string[] dbFile)
         {
+            //look in text file "userDB.txt" for the line "For Sale:" and "SignIn.username"
+            //make sure this item has a bet on it by making sure the sixth line is NOT empty
             int iterator = 0;
-
-
             for (int c = 0; c < dbFile.Length; c++)
             {
 
@@ -119,7 +130,7 @@ namespace AuctionMenu
             lineChanger(SignIn.username, "userDB.txt", lineForEditing + 4);
             lineChanger(SignIn.email, "userDB.txt", lineForEditing + 5);
             lineChanger(bid, "userDB.txt", lineForEditing + 6);
-
+            
 
 
 
@@ -152,7 +163,7 @@ namespace AuctionMenu
             if (searchPhrase == "ALL" || searchPhrase == "all")
             {
 
-
+                int secondCount = 0;
                 int count = 0;
                 string[] str = createArray("userDB.txt");
                 string[] sortedArray = createArray("userDB.txt");
@@ -200,14 +211,15 @@ namespace AuctionMenu
 
 
                         }
-                        if (count == sortedArray.Length - 1)
+                        //Working
+                        if (count == sortedArray.Length)
                         {
                             break;
                         }
 
                     }
 
-                    if (count == sortedArray.Length - 1)
+                    if (count == sortedArray.Length)
                     {
                         break;
                     }
@@ -376,12 +388,12 @@ namespace AuctionMenu
             for (int i = 0; i < databaseFile.Length; i++)
             {
 
-                if (databaseFile[i] == "For Sale:" && databaseFile[i + 3].Contains(searchPhrase) == true)
+                if (databaseFile[i] == "For Sale:" && databaseFile[i + 3].Contains(searchPhrase+" ") || (databaseFile[i] == "For Sale:" && databaseFile[i + 4].Contains(searchPhrase+" "))) //HERE
                 {
 
 
                     int count = 0;
-
+                    
                     string[] str = createArray("userDB.txt");
                     string[] sortedArray = createArray("userDB.txt");
                     arrayAlphabetSpecificSearch(sortedArray, databaseFile, searchPhrase);
@@ -389,6 +401,7 @@ namespace AuctionMenu
 
                     while (true)
                     {
+                        int secondCount = 0;
                         for (int b = 0; b < databaseFile.Length - 3; b++)
                         {
                             if (count == sortedArray.Length)
@@ -598,6 +611,7 @@ namespace AuctionMenu
                 }
 
             }//Alot of stuff to do. Print the "For Sale:" items to the screen if a specific match is found within its Name or Description
+            //Finds alphabetically and orders them, the items that are for sale and match the product search
         }
         static void lineUnderliner(int stringLength)
         {
