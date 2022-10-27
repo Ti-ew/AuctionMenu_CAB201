@@ -63,15 +63,16 @@ namespace AuctionMenu
             TextWriter EZ = new StreamWriter("userDB.txt", true);
             EZ.WriteLine(userPass);
             EZ.WriteLine("");
+            EZ.WriteLine("");
             EZ.Close();
         }
 
         public void checkPassParam(string password)
         {
             WriteLine("* At least 8 characters");
-            WriteLine("* No whitespace characters");
-            WriteLine("* At least one uppercase letter");
-            WriteLine("* At least one lowercase letter");
+            WriteLine("* No white space characters");
+            WriteLine("* At least one upper-case letter");
+            WriteLine("* At least one lower-case letter");
             WriteLine("* At least one digit");
             WriteLine("* At least one special character");
             Write("> ");

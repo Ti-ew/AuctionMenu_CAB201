@@ -1,4 +1,5 @@
 using static System.Console;
+using System.Globalization;
 
 namespace AuctionMenu
 {
@@ -7,8 +8,15 @@ namespace AuctionMenu
         string addy;
         string homeAddy;
         string productName;
-        
 
+        public static string RemoveNonNumeric(string s)
+        {
+            return s.Replace("$", "");
+        }
+        public static String GetTimestamp(DateTime value)
+        {
+            return value.ToString("dd/mm/yyyy hh:mm");
+        }
         string[] viewAlphabet(string[] arrayToSort, string[] dbFile)
         {
             int iterator = 1;
@@ -129,7 +137,7 @@ namespace AuctionMenu
             }
             lineChanger(SignIn.username, "userDB.txt", lineForEditing + 4);
             lineChanger(SignIn.email, "userDB.txt", lineForEditing + 5);
-            lineChanger(bid, "userDB.txt", lineForEditing + 6);
+            lineChanger("$"+bid, "userDB.txt", lineForEditing + 6);
             
 
 
@@ -159,7 +167,7 @@ namespace AuctionMenu
 
             string[] databaseFile = readDB("userDB.txt");
             WriteLine("\nSearch results\n--------------\n");
-            WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
+            WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amt");
             if (searchPhrase == "ALL" || searchPhrase == "all")
             {
 
@@ -194,18 +202,18 @@ namespace AuctionMenu
                                 {
                                     Write("{0}\t", databaseFile[i + j]);
 
-                                    str[j - 1 + secondCount] = databaseFile[i + j];
+                                    str[j - 2 + secondCount] = databaseFile[i + j];
                                 }
                                 if (databaseFile[i + j] == "")
                                 {
                                     Write("-\t");
-                                    str[j - 1 + secondCount] = "-";
+                                    str[j - 2 + secondCount] = "-";
 
                                 }
 
 
                             }
-                            secondCount += 8;
+                            secondCount += 7;
                             Write("\n");
 
 
@@ -224,12 +232,12 @@ namespace AuctionMenu
                         break;
                     }
                 }
-                WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
+                WriteLine("\n\nWould you like to place a bid on any of these items (yes or no)?");
                 Write("> ");
                 string YesOrNoBid = ReadLine();
                 if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
                 {
-                    WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
+                    WriteLine("\nPlease enter a non-negative integer between 1 and {0}:", count);
                     Write("> ");
                     string answer4 = ReadLine();
 
@@ -237,39 +245,104 @@ namespace AuctionMenu
                     {
                         if (answer4 == str[a])
                         {
-                            WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a + 1], str[a + 3], str[a + 6]);
+                            WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}\n", str[a + 1], str[a + 3], str[a + 6]);
                             //Bid amount check. NO BROKEY'S
 
 
 
-
+                            string bidAmount = "";
+                            
                             WriteLine("\nHow much do you bid?");
-                            Write("> ");
-                            string bidAmount = ReadLine();
+                            while (true)
+                            {
+                                Write("> ");
+                                bidAmount = ReadLine();
+                                RemoveNonNumeric(bidAmount);
+                                string highestBid = str[a + 6];
+                                RemoveNonNumeric(highestBid);
+                                if (Double.Parse(bidAmount) > Double.Parse(highestBid))
+                                {
+                                    break;
+                                }
+                                else 
+                                {
+                                    WriteLine("\tBid amount must be greater than {0}\n", str[a+6]);
+
+                                    WriteLine("\nHow much do you bid?");
+                                }
+                            }
                             productName = str[a + 1];
                             updateBid(bidAmount);
-                            WriteLine("\nYour bid of {0} for {1} has been placed\n", bidAmount, productName);
+                            WriteLine("\nYour bid of {0} for {1} has been placed.\n", bidAmount, productName);
                         }
                     }
                     WriteLine("\nDelivery Instructions\n---------------------");
                     Write("(1) Click and collect\n");
                     Write("(2) Home Delivery\n");
-
+                    String timeStamp = GetTimestamp(DateTime.Now);
+                    var parsedDate = DateTime.Parse(timeStamp);
+                    DateTime dt2;
+                    WriteLine("Please select an option between 1 and 2");
+                    DateTime dt3;
                     while (true)
                     {
                         Write("> ");
                         string deliveryOption = ReadLine();
+                        string dateHourStart = "";
+                        string dateMonthStart = "";
+                        string dateHourEnd = "";
+                        string dateMonthEnd = "";
                         if (deliveryOption == "1")
                         {
 
+                            WriteLine("\nDelivery window start (dd/mm/yyyy hh:mm)");
+                            while (true)
+                            {
+
+                                Write("> ");
+                                string deliveryWindowStart = ReadLine();
+                                string[] hoursMonths = deliveryWindowStart.Split(' ');
+                                dateMonthStart = hoursMonths[0];
+                                dateHourStart = hoursMonths[1];
+                                DateTime dt1 = DateTime.ParseExact(deliveryWindowStart, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+                                TimeSpan diff = dt1 - DateTime.Now;
+                                if (diff.TotalHours > 1)
+                                {
+                                    dt2 = dt1.AddHours(1);
+                                    break;
+                                }
+                                else
+                                {
+                                    WriteLine("Delivery window must be at least 1 hour from now");
+                                }
+                            }
+                            WriteLine("\nDelivery window end (dd/mm/yyyy hh:mm)");
+                            while (true)
+                            {
+
+                                Write("> ");
+                                string deliveryWindow = ReadLine();
+                                string[] hoursMonths = deliveryWindow.Split(' ');
+                                dateMonthEnd = hoursMonths[0];
+                                dateHourEnd = hoursMonths[1];
+                                DateTime dt1 = DateTime.ParseExact(deliveryWindow, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+                                if (dt1 > DateTime.Now && dt1 > dt2)
+                                {
+                                    dt3 = dt1;
+                                    break;
+                                }
+                            }
+                            WriteLine("\nThank you for your bid. If successful, the item will be provided via collection between {0} on {1} and {2} on {3}", dateHourStart, dateMonthStart, dateHourEnd, dateMonthEnd);
+                            break;
                         }
                         if (deliveryOption == "2")
                         {
+                            WriteLine("\nPlease provide your delivery address.\n");
                             //Home delivery stuff
                             while (true)
                             {
 
-                                Console.WriteLine("Unit number  (0 = none):");
+                                Console.WriteLine("Unit number (0 = none):");
                                 Write("> ");
                                 var input = Console.ReadLine();
 
@@ -329,7 +402,7 @@ namespace AuctionMenu
                             homeAddy += city + " ";
                             Write("\n");
                             //No barrier needed
-                            string[] values = { "ACT", "act", "NSW", "nsw", "NT", "nt", "QLD", "qld", "SA", "sa", "TAS", "tas", "VIC", "vic", "WA", "wa" };
+                            string[] values = { "ACT", "act", "Act", "NSW", "nsw", "Nsw", "NT", "nt", "Nt", "QLD", "qld", "Qld", "SA", "sa", "Sa", "TAS", "tas", "Tas", "VIC", "vic", "Vic", "WA", "wa", "Wa" };
                             string deliveryState;
                             while (true)
                             {
@@ -339,6 +412,7 @@ namespace AuctionMenu
 
                                 if (values.Contains(deliveryState))
                                 {
+                                    deliveryState = deliveryState.ToUpper();
                                     homeAddy += deliveryState + " ";
                                     break;
                                 }
@@ -354,7 +428,7 @@ namespace AuctionMenu
                             while (true)
                             {
 
-                                Console.WriteLine("Postcode  (1000 - 9999):");
+                                Console.WriteLine("Postcode (1000 .. 9999):");
                                 Write("> ");
                                 var postcode = Console.ReadLine();
 
@@ -376,24 +450,24 @@ namespace AuctionMenu
                             //update userDB with delivery address
                             updateUserDBDelivery(homeAddy);
                             break;
+
                         }
                     }
-
 
                 }
 
             }//Alot of stuff to do. Print the "For Sale:" items to the screen
 
 
-            for (int i = 0; i < databaseFile.Length; i++)
+            for (int i = 4; i < databaseFile.Length; i++)
             {
 
-                if (databaseFile[i] == "For Sale:" && databaseFile[i + 3].Contains(searchPhrase+" ") || (databaseFile[i] == "For Sale:" && databaseFile[i + 4].Contains(searchPhrase+" "))) //HERE
+                if (databaseFile[i-3] == "For Sale:" && databaseFile[i].Contains(searchPhrase) || (databaseFile[i-4] == "For Sale:" && databaseFile[i].Contains(searchPhrase))) //HERE
                 {
 
 
                     int count = 0;
-                    
+                    int secondCount = 0;
                     string[] str = createArray("userDB.txt");
                     string[] sortedArray = createArray("userDB.txt");
                     arrayAlphabetSpecificSearch(sortedArray, databaseFile, searchPhrase);
@@ -401,7 +475,7 @@ namespace AuctionMenu
 
                     while (true)
                     {
-                        int secondCount = 0;
+                        
                         for (int b = 0; b < databaseFile.Length - 3; b++)
                         {
                             if (count == sortedArray.Length)
@@ -424,18 +498,18 @@ namespace AuctionMenu
                                     {
                                         Write("{0}\t", databaseFile[b + j]);
 
-                                        str[j - 1 + secondCount] = databaseFile[b + j];
+                                        str[j - 2 + secondCount] = databaseFile[b + j];
                                     }
                                     if (databaseFile[b + j] == "")
                                     {
                                         Write("-\t");
-                                        str[j - 1 + secondCount] = "-";
+                                        str[j - 2 + secondCount] = "-";
 
                                     }
 
 
                                 }
-                                secondCount += 8;
+                                secondCount += 7;
                                 Write("\n");
 
 
@@ -454,12 +528,12 @@ namespace AuctionMenu
                             break;
                         }
                     }
-                    WriteLine("\nWould you like to place a bid on any of these items (yes or no)?");
+                    WriteLine("\n\nWould you like to place a bid on any of these items (yes or no)?");
                     Write("> ");
                     string YesOrNoBid = ReadLine();
                     if (YesOrNoBid == "yes" || YesOrNoBid == "YES")
                     {
-                        WriteLine("\nPlease enter a non-negative integer between 1 and {0}", count);
+                        WriteLine("\nPlease enter a non-negative integer between 1 and {0}:", count);
                         Write("> ");
                         string answer4 = ReadLine();
 
@@ -467,34 +541,118 @@ namespace AuctionMenu
                         {
                             if (answer4 == str[a])
                             {
-                                WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}", str[a + 2], str[a + 4], str[a + 5]);
-                                WriteLine("\nHow much do you bid?");
-                                Write("> ");
-                                string bidAmount = ReadLine();
+                                if (str[a+6] == "-")
+                                {
+                                    str[a+6] = "$0.00";
+                                }
+                                WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}\n", str[a + 1], str[a + 3], str[a + 6]);
+                                //Bid amount check. NO BROKEY'S
+
+
+
+                                string bidAmount = "";
+
+                                WriteLine("\nHow much do you bid?");                                
+                                while (true)
+                                {
+                                    
+
+                                    Write("> ");
+                                    bidAmount = ReadLine();
+                                    if (bidAmount.Contains("$") == false)
+                                    {
+                                        WriteLine("\tInvalid currency");
+                                        return;
+                                    }
+
+                                    bidAmount = bidAmount.Replace(@"$", "");
+
+                                    string highestBid = str[a + 6];
+                                    
+                                    highestBid = highestBid.Replace(@"$", "");
+                                    
+                                    if (Double.Parse(bidAmount) > Double.Parse(highestBid))
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        WriteLine("\tBid amount must be greater than {0}", str[a + 6]);
+                                        WriteLine("\nHow much do you bid?");
+
+                                    }
+                                }
                                 productName = str[a + 1];
                                 updateBid(bidAmount);
-                                WriteLine("\nYour bid of {0} for {1} has been placed\n", bidAmount, productName);
-                                break;
+                                WriteLine("\nYour bid of ${0} for {1} is placed.\n", bidAmount, productName);
                             }
                         }
                         WriteLine("Delivery Instructions\n---------------------");
                         Write("(1) Click and collect\n");
-                        Write("(2) Home Delivery\n");
+                        Write("(2) Home Delivery\n\n");
+                        DateTime dt2;
+                        DateTime dt3;
+                        WriteLine("Please select an option between 1 and 2");
                         while (true)
                         {
                             Write("> ");
                             string deliveryOption = ReadLine();
+                            string dateHourStart = "";
+                            string dateMonthStart = "";
+                            string dateHourEnd = "";
+                            string dateMonthEnd = "";
                             if (deliveryOption == "1")
                             {
+                                
+                                WriteLine("\nDelivery window start (dd/mm/yyyy hh:mm)");
+                                while (true)
+                                {
 
+                                    Write("> ");
+                                    string deliveryWindowStart = ReadLine();
+                                    string[] hoursMonths = deliveryWindowStart.Split(' ');
+                                    dateMonthStart = hoursMonths[0];
+                                    dateHourStart = hoursMonths[1];
+                                    DateTime dt1 = DateTime.ParseExact(deliveryWindowStart, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+                                    TimeSpan diff = dt1 - DateTime.Now;
+                                    if (diff.TotalHours > 1)
+                                    {
+                                        dt2 = dt1.AddHours(1);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        WriteLine("Delivery window must be at least 1 hour from now");
+                                    }
+                                }
+                                WriteLine("\nDelivery window end (dd/mm/yyyy hh:mm)");
+                                while (true)
+                                {
+
+                                    Write("> ");
+                                    string deliveryWindow = ReadLine();
+                                    string[] hoursMonths = deliveryWindow.Split(' ');
+                                    dateMonthEnd = hoursMonths[0];
+                                    dateHourEnd = hoursMonths[1];
+                                    DateTime dt1 = DateTime.ParseExact(deliveryWindow, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+                                    if (dt1 > DateTime.Now && dt1 > dt2)
+                                    {
+                                        dt3 = dt1;
+                                        break;
+                                    }
+                                }
+                                WriteLine("\nThank you for your bid. If successful, the item will be provided via collection between {0} on {1} and {2} on {3}", dateHourStart, dateMonthStart, dateHourEnd, dateMonthEnd);
+                                break;
                             }
                             if (deliveryOption == "2")
                             {
+                                WriteLine("\nPlease provide your delivery address.\n");
                                 //Home delivery stuff
                                 while (true)
                                 {
 
-                                    Console.WriteLine("\nUnit number  (0 = none):");
+                                    Console.WriteLine("Unit number (0 = none):");
+                                    Write("> ");
                                     var input = Console.ReadLine();
 
 
@@ -553,7 +711,7 @@ namespace AuctionMenu
                                 homeAddy += city + " ";
                                 Write("\n");
                                 //No barrier needed
-                                string[] values = { "ACT", "act", "NSW", "nsw", "NT", "nt", "QLD", "qld", "SA", "sa", "TAS", "tas", "VIC", "vic", "WA", "wa" };
+                                string[] values = { "ACT", "act", "Act", "NSW", "nsw", "Nsw", "NT", "nt", "Nt", "QLD", "qld", "Qld", "SA", "sa", "Sa", "TAS", "tas", "Tas", "VIC", "vic", "Vic", "WA", "wa", "Wa" };
                                 string deliveryState;
                                 while (true)
                                 {
@@ -563,6 +721,7 @@ namespace AuctionMenu
 
                                     if (values.Contains(deliveryState))
                                     {
+                                        deliveryState = deliveryState.ToUpper();
                                         homeAddy += deliveryState + " ";
                                         break;
                                     }
@@ -578,7 +737,7 @@ namespace AuctionMenu
                                 while (true)
                                 {
 
-                                    Console.WriteLine("Postcode  (1000 - 9999):");
+                                    Console.WriteLine("Postcode (1000 .. 9999):");
                                     Write("> ");
                                     var postcode = Console.ReadLine();
 
@@ -662,7 +821,7 @@ namespace AuctionMenu
             }
             void advertiseProduct()
             {
-                WriteLine("\nProduct Advertisement for {0}({1})", SignIn.username, SignIn.email);
+                WriteLine("\n\nProduct Advertisement for {0}({1})", SignIn.username, SignIn.email);
                 string productAdString = "Product Advertisement for {0}({1})";
                 int LineLength = productAdString.Length + SignIn.username.Length + SignIn.email.Length - 6;
                 lineUnderliner(LineLength);
@@ -701,7 +860,7 @@ namespace AuctionMenu
                     WriteLine("\tA currency value is required, e.g. $54.95, $9.99, $2314.15\n");
                 }
 
-                WriteLine("\nSuccessfully added product {0}, {1}, {2}", productName, productDescription, verifiedProductPrice);
+                WriteLine("\nSuccessfully added product {0}, {1}, {2}.", productName, productDescription, verifiedProductPrice);
                 TextWriter db = new StreamWriter("userDB.txt", true);
                 db.WriteLine("For Sale:");
                 db.WriteLine(SignIn.username);
@@ -726,7 +885,7 @@ namespace AuctionMenu
                 string anotherUnderline = "\nProduct List for {0}({1})";
                 int lengthOfUnderline = anotherUnderline.Length + SignIn.email.Length + SignIn.username.Length - 6;
                 lineUnderliner(lengthOfUnderline);
-                WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
+                WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amt");
                 int counter = 0;
                 string[] databaseFile = readDB("userDB.txt");
                 string[] sortedArray = createArray("userDB.txt");
@@ -747,7 +906,7 @@ namespace AuctionMenu
                                 if (databaseFile[i + j] == "")
                                 {
                                     Write("-\t");
-                                }
+                                }                                
                                 Write(databaseFile[i + j] + "\t");
                             }
                             Write("\n");
@@ -768,16 +927,16 @@ namespace AuctionMenu
             void goShopping()
             {
                 //Time to place some bids.
-                WriteLine("\nProduct search for {0}({1})", SignIn.username, SignIn.email);
+                WriteLine("\nProduct Search for {0}({1})", SignIn.username, SignIn.email);
                 string productSearch = "Product search for {0}({1)";
-                int productSearchLen = productSearch.Length + SignIn.username.Length + SignIn.email.Length - 6;
+                int productSearchLen = productSearch.Length + SignIn.username.Length + SignIn.email.Length - 5;
                 lineUnderliner(productSearchLen);
                 while (true)
                 {
                     //Lets begin, first open up a databaseFile, recalling it as changes may have been made.
                     string[] databaseFile = readDB("userDB.txt");
 
-                    WriteLine("\nPlease supply a search phrase (ALL to see all products)");
+                    WriteLine("\n\nPlease supply a search phrase (ALL to see all products)");
                     //Use this readLine as a way of comparing to the databaseFile if a search is given
                     //IF not continue to display all "For Sale:" items
                     Write("> ");
@@ -797,7 +956,7 @@ namespace AuctionMenu
                 string anotherUnderline = "Product List for {0}({1})";
                 int lengthOfUnderline = anotherUnderline.Length + SignIn.email.Length + SignIn.username.Length - 6;
                 lineUnderliner(lengthOfUnderline);
-                WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amnt");
+                WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amt");
                 int counter = 0;
 
                 int tempArrCount = 0;
@@ -811,6 +970,10 @@ namespace AuctionMenu
                 {
                     for (int i = 0; i < databaseFile.Length; i++)
                     {
+                        if (counter == sortedArray.Length)
+                        {
+                            break;
+                        }
 
                         if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username && databaseFile[i + 9] != "" && sortedArray[counter] == databaseFile[i + 3])
                         {
@@ -896,20 +1059,20 @@ namespace AuctionMenu
                         string PersonalDetails = "Personal Details for {0}({1})";
                         int PersonalDetailsLength = (PersonalDetails.Length + SignIn.username.Length + SignIn.email.Length - 6);
                         lineUnderliner(PersonalDetailsLength);
-                        WriteLine("\nPlease provide your home address.\n");
+                        WriteLine("\nPlease provide your home address.");
                         //Whole bunch of main menu printing logic
 
                         while (true)
                         {
 
-                            Console.WriteLine("\nUnit number  (0 = none):");
+                            Console.WriteLine("\nUnit number (0 = none):");
                             Write("> ");
                             var input = Console.ReadLine();
 
-
+                            
                             if (int.TryParse(input, out var value) && value > 0)
                             {
-                                homeAddy += input + "/";
+                                addy += value + "/";
                                 break;
                             }
                             if (int.TryParse(input, out var bruh) && bruh == 0)
@@ -976,6 +1139,7 @@ namespace AuctionMenu
 
                             if (values.Contains(state))
                             {
+                                state = state.ToUpper();
                                 addy += state + " ";
                                 break;
                             }
@@ -992,7 +1156,7 @@ namespace AuctionMenu
                         while (true)
                         {
 
-                            Console.WriteLine("Postcode  (1000 - 9999):");
+                            Console.WriteLine("Postcode (1000 .. 9999):");
                             Write("> ");
                             var postcode = Console.ReadLine();
 
@@ -1025,7 +1189,7 @@ namespace AuctionMenu
                 }
                 while (true)
                 {
-                    string[] options = { "(1) Advertise product", "(2) View my product list", "(3) Search for advertised products", "(4) View bids on my products", "(5) View my purchased items", "(6) Log off\n" };
+                    string[] options = { "(1) Advertise Product", "(2) View My Product List", "(3) Search For Advertised Products", "(4) View Bids On My Products", "(5) View My Purchased Items", "(6) Log off\n" };
                     WriteLine("\nClient Menu\r\n-----------");
                     for (int i = 0; i < options.Length; i++)
                     {
