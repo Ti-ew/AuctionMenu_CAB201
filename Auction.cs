@@ -9,7 +9,7 @@ namespace AuctionMenu
 {
     public class MainPage
     {
-        public int count = 0;
+        
         public void Start(string prompt)
         {
             WriteLine(prompt);
