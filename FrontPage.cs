@@ -283,7 +283,9 @@ namespace AuctionMenu
             WriteLine("Item #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amt");
             if (searchPhrase == "ALL" || searchPhrase == "all")
             {
-
+                string lineForDeliveryWindow = "";
+                string deliveryWindow = "";
+                string deliveryWindowStart = "";
                 int secondCount = 0;
                 int count = 0;
                 string[] str = createArray("userDB.txt");
@@ -358,6 +360,7 @@ namespace AuctionMenu
                     {
                         if (answer4 == str[a])
                         {
+                            lineForDeliveryWindow = str[a+1];
 							if (str[a+6] == "-")
 							{
                                 str[a+6] = "$0.00";
@@ -397,6 +400,7 @@ namespace AuctionMenu
                             productName = str[a + 1];
                             updateBid(bidAmount);
                             WriteLine("\nYour bid of ${0} for {1} is placed.", bidAmount, productName);
+                            break;
                         }
                     }
                     WriteLine("\nDelivery Instructions\n---------------------");
@@ -420,15 +424,15 @@ namespace AuctionMenu
                             while (true)
                             {
 
-                                Write("> ");
-                                string deliveryWindowStart = ReadLine();
-                                string[] hoursMonths = deliveryWindowStart.Split(' ');
-                                dateMonthStart = hoursMonths[0];
-                                dateHourStart = hoursMonths[1];
-                                string[] dateJustHour = dateMonthStart.Split(':');
-                                dateHourStart = convert24to12(dateJustHour[0], dateJustHour[1]);
-                                DateTime dt1 = DateTime.ParseExact(deliveryWindowStart, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
-                                TimeSpan diff = dt1 - DateTime.Now;
+								Write("> ");
+								deliveryWindowStart = ReadLine();
+								string[] hoursMonths = deliveryWindowStart.Split(' ');
+								dateMonthStart = hoursMonths[0];
+								dateHourStart = hoursMonths[1];
+								string[] dateJustHour = dateHourStart.Split(':');
+								dateHourStart = convert24to12(dateJustHour[0], dateJustHour[1]);
+								DateTime dt1 = DateTime.ParseExact(deliveryWindowStart, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+								TimeSpan diff = dt1 - DateTime.Now;																
                                 if (diff.TotalHours > 1)
                                 {
                                     dt2 = dt1.AddHours(1);
@@ -439,16 +443,16 @@ namespace AuctionMenu
                                     WriteLine("Delivery window must be at least 1 hour from now");
                                 }
                             }
-                            WriteLine("\nDelivery window end (dd/mm/yyyy hh:mm)");
+                            WriteLine("\nDelivery window end (dd/mm/yyyy hh:mm)");                            
                             while (true)
                             {
 
                                 Write("> ");
-                                string deliveryWindow = ReadLine();
+                                deliveryWindow = ReadLine();
                                 string[] hoursMonths = deliveryWindow.Split(' ');
                                 dateMonthEnd = hoursMonths[0];
                                 dateHourEnd = hoursMonths[1];								
-								string[] dateJustHour = dateMonthEnd.Split(':');
+								string[] dateJustHour = dateHourEnd.Split(':');
 								dateHourEnd = convert24to12(dateJustHour[0], dateJustHour[1]);
 								DateTime dt1 = DateTime.ParseExact(deliveryWindow, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
                                 if (dt1 > DateTime.Now && dt1 > dt2)
@@ -458,6 +462,15 @@ namespace AuctionMenu
                                 }
                             }
                             WriteLine("\nThank you for your bid. If successful, the item will be provided via collection between {0} on {1} and {2} on {3}", dateHourStart, dateMonthStart, dateHourEnd, dateMonthEnd);
+                            string TimeToDeliver = dateHourStart + " on " + dateMonthStart + " and " + dateHourEnd + " on " + dateMonthEnd;
+                            for (int i = 0; i < databaseFile.Length; i++)
+                            {
+                                if (databaseFile[i] == lineForDeliveryWindow)
+                                {
+									lineChanger(TimeToDeliver, "userDB.txt", i+7);
+									break;
+								}
+                            }
                             break;
                         }
                         if (deliveryOption == "2")
@@ -590,7 +603,7 @@ namespace AuctionMenu
                 if (databaseFile[i-3] == "For Sale:" && databaseFile[i].Contains(searchPhrase) || (databaseFile[i-4] == "For Sale:" && databaseFile[i].Contains(searchPhrase))) //HERE
                 {
 
-
+                    string lineForDeliveryWindow = "";
                     int count = 0;
                     int secondCount = 0;
                     string[] str = createArray("userDB.txt");
@@ -666,7 +679,8 @@ namespace AuctionMenu
                         {
                             if (answer4 == str[a])
                             {
-                                if (str[a+6] == "-")
+								lineForDeliveryWindow = str[a + 1];
+								if (str[a+6] == "-")
                                 {
                                     str[a+6] = "$0.00";
                                 }
@@ -711,6 +725,7 @@ namespace AuctionMenu
                                 productName = str[a + 1];
                                 updateBid(bidAmount);
                                 WriteLine("\nYour bid of ${0} for {1} is placed.\n", bidAmount, productName);
+                                break;
                             }
                         }
                         WriteLine("Delivery Instructions\n---------------------");
@@ -772,7 +787,16 @@ namespace AuctionMenu
                                     }
                                 }
                                 WriteLine("\nThank you for your bid. If successful, the item will be provided via collection between {0} on {1} and {2} on {3}", dateHourStart, dateMonthStart, dateHourEnd, dateMonthEnd);
-                                break;
+								string TimeToDeliver = dateHourStart + " on " + dateMonthStart + " and " + dateHourEnd + " on " + dateMonthEnd;
+								for (int f = 0; f < databaseFile.Length; f++)
+								{
+									if (databaseFile[f] == lineForDeliveryWindow)
+									{
+										lineChanger(TimeToDeliver, "userDB.txt", i + 7);
+										break;
+									}
+								}
+								break;
                             }
                             if (deliveryOption == "2")
                             {
@@ -933,7 +957,11 @@ namespace AuctionMenu
                     //Here goes the stuff to check if it is a value or a "-"
                     if (databaseFile[j] == "Sold:" && databaseFile[j + 6] == SignIn.username)
                     {
-						WriteLine("Item #\tSeller email\tProduct name\tDescription\tList price\tAmt paid\tDelivery Option\t");
+						if (itemNum  == 1)
+                        {
+							WriteLine("Item #\tSeller email\tProduct name\tDescription\tList price\tAmt paid\tDelivery Option\t");
+						}
+						
 						
 
                         Write(itemNum.ToString() + "\t");
@@ -942,9 +970,18 @@ namespace AuctionMenu
                         Write(databaseFile[j + 4] + "\t");
                         Write(databaseFile[j + 5] + "\t");
                         Write(databaseFile[j + 8] + "\t");
-                        Write("Deliver to {0}", databaseFile[j + 9]);
+                        if (databaseFile[j+9].Contains(":"))
+                        {
+                            Write("Collect between {0}", databaseFile[j + 9]);
+                        }
+                        if (!databaseFile[j+9].Contains(":"))
+                        {
+							Write("Deliver to {0}\t", databaseFile[j + 9]);
+						}
+                        
                         itemNum++;
                         Write("\n");
+                        
                     }
 
                 }
@@ -1115,7 +1152,7 @@ namespace AuctionMenu
                             break;
                         }
 
-                        if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username && databaseFile[i + 9] != "" && sortedArray[counter] == databaseFile[i + 3])
+                        if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username && databaseFile[i + 8] != "" && sortedArray[counter] == databaseFile[i + 3])
                         {
                             
 							
@@ -1125,6 +1162,10 @@ namespace AuctionMenu
 								{
 									WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amt");
 								}
+								if (counter > 1)
+                                {
+                                    Write("\n");
+                                }
 								counter++;
                                 Write(counter + "\t");
                                 tempArr[tempArrCount] = counter.ToString();
@@ -1142,7 +1183,7 @@ namespace AuctionMenu
                                     tempArrCount++;
 
                                 }
-                                Write("\n");
+                                
                             }
 
 
