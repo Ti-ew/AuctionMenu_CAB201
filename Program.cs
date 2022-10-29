@@ -20,7 +20,7 @@ namespace Program
 
             while (true)
             {
-                AuctionMainPage auction = new AuctionMainPage();//Includes the front menu
+                MainPage auction = new MainPage();//Includes the front menu
                 auction.Start(prompt);//Includes registration menu (looped to send user back to front menu)
                                       //Exit of this first menu is done by loggin in successfully
 

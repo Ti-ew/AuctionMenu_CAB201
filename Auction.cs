@@ -7,7 +7,7 @@ using static System.Console;
 
 namespace AuctionMenu
 {
-    public class AuctionMainPage
+    public class MainPage
     {
         public int count = 0;
         public void Start(string prompt)

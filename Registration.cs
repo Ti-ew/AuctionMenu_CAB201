@@ -13,7 +13,7 @@ namespace AuctionMenu
         public static string Name;
         public static string userPass;
         public static string userEmail;
-        public static string prompt = "";
+        
 
         //string curDir = Directory.GetCurrentDirectory();//Get current directory
         public void userSignUp()//User sign up method
@@ -44,8 +44,8 @@ namespace AuctionMenu
             updateUserDatabase();
             WriteLine("\nClient {0}({1}) has successfully registered at the Auction House.", Name, userEmail);
 
-            AuctionMainPage auction = new AuctionMainPage();//Includes the front menu
-            auction.Start(prompt);//Includes registration menu (looped to send user back to front menu)
+            MainPage auction = new MainPage();//Includes the front menu
+            auction.Start("");//Includes registration menu (looped to send user back to front menu)
                                   //Exit of this first menu is done by loggin in successfully
 
 

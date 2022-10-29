@@ -303,7 +303,7 @@ namespace AuctionMenu
                             if (count != 0)
                             {
                                 Write(count + "\t");//Print the number
-                                str[secondCount + 1] = count.ToString();//Print the number to an array of string to choose from
+                                str[secondCount] = count.ToString();//Print the number to an array of string to choose from
 
                             }
 
@@ -358,7 +358,11 @@ namespace AuctionMenu
                     {
                         if (answer4 == str[a])
                         {
-                            WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}\n", str[a + 1], str[a + 3], str[a + 6]);
+							if (str[a+6] == "-")
+							{
+                                str[a+6] = "$0.00";
+							}
+							WriteLine("\nBidding for {0} (regular price {1}), current highest bid {2}\n", str[a + 1], str[a + 3], str[a + 6]);
                             //Bid amount check. NO BROKEY'S
 
 
@@ -370,9 +374,14 @@ namespace AuctionMenu
                             {
                                 Write("> ");
                                 bidAmount = ReadLine();
-                                RemoveNonNumeric(bidAmount);
-                                string highestBid = str[a + 6];
-                                RemoveNonNumeric(highestBid);
+								if (bidAmount.Contains("$") == false)
+								{
+									WriteLine("\tInvalid currency");
+									return;
+								}
+								bidAmount = RemoveNonNumeric(bidAmount);
+                                string highestBid = str[a + 6];							
+								highestBid = RemoveNonNumeric(highestBid);
                                 if (Double.Parse(bidAmount) > Double.Parse(highestBid))
                                 {
                                     break;
@@ -387,17 +396,15 @@ namespace AuctionMenu
                             }
                             productName = str[a + 1];
                             updateBid(bidAmount);
-                            WriteLine("\nYour bid of {0} for {1} has been placed.\n", bidAmount, productName);
+                            WriteLine("\nYour bid of ${0} for {1} is placed.", bidAmount, productName);
                         }
                     }
                     WriteLine("\nDelivery Instructions\n---------------------");
                     Write("(1) Click and collect\n");
                     Write("(2) Home Delivery\n");
-                    String timeStamp = GetTimestamp(DateTime.Now);
-                    var parsedDate = DateTime.Parse(timeStamp);
-                    DateTime dt2;
-                    WriteLine("Please select an option between 1 and 2");
                     DateTime dt3;
+                    DateTime dt2;
+                    WriteLine("\nPlease select an option between 1 and 2");                    
                     while (true)
                     {
                         Write("> ");
@@ -911,12 +918,13 @@ namespace AuctionMenu
 
             void viewPurchased()
             {
-                WriteLine("\nPurchased items for {0}({1})", SignIn.username, SignIn.email);
+                WriteLine("\nPurchased Items for {0}({1})", SignIn.username, SignIn.email);
                 int tempUnderline = "Purchased items for {0}({1})".Length + SignIn.username.Length + SignIn.email.Length - 6;
                 lineUnderliner(tempUnderline);
-                // Stuff for the table, PIPE deez
-                WriteLine("Item #\tSeller email\tProduct name\tDescription\tList price\tAmt paid\tDelivery Option");
-                string[] databaseFile = readDB("userDB.txt");
+                Write("\n");
+				// Stuff for the table, PIPE deez
+				int itemNum = 1;
+				string[] databaseFile = readDB("userDB.txt");
 
                 for (int j = 0; j < databaseFile.Length; j++)
                 {
@@ -925,7 +933,8 @@ namespace AuctionMenu
                     //Here goes the stuff to check if it is a value or a "-"
                     if (databaseFile[j] == "Sold:" && databaseFile[j + 6] == SignIn.username)
                     {
-                        int itemNum = 1;
+						WriteLine("Item #\tSeller email\tProduct name\tDescription\tList price\tAmt paid\tDelivery Option\t");
+						
 
                         Write(itemNum.ToString() + "\t");
                         Write(databaseFile[j + 2] + "\t");
@@ -939,9 +948,15 @@ namespace AuctionMenu
                     }
 
                 }
+				if (itemNum == 1)
+                {
+				
+						WriteLine("You have no purchased products at the moment.");
+				}
 
 
-            }
+
+			}
             void advertiseProduct()
             {
                 WriteLine("\n\nProduct Advertisement for {0}({1})", SignIn.username, SignIn.email);
@@ -1075,17 +1090,18 @@ namespace AuctionMenu
             {
 
                 //Check iF bro is broke and isnt advertising
-                WriteLine("\nProduct List for {0}({1})", SignIn.username, SignIn.email);
-                string anotherUnderline = "Product List for {0}({1})";
-                int lengthOfUnderline = anotherUnderline.Length + SignIn.email.Length + SignIn.username.Length - 6;
-                lineUnderliner(lengthOfUnderline);
-                WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amt");
+                WriteLine("\n\nList Product Bids for {0}({1})", SignIn.username, SignIn.email);
+                string anotherUnderline = "List Product Bids for {0}({1})";
+                int lengthOfUnderline = anotherUnderline.Length + SignIn.email.Length + SignIn.username.Length - 6;				
+				lineUnderliner(lengthOfUnderline);
+                			
+                
                 int counter = 0;
 
                 int tempArrCount = 0;
                 string[] databaseFile = readDB("userDB.txt");
                 string[] tempArr = new string[databaseFile.Length];
-
+                bool noBids = false;
                 string[] sortedArray = createArray("userDB.txt");
                 bidsAlphabet(sortedArray, databaseFile);
                 sortedArray = sortedArray.Where(c => !string.IsNullOrEmpty(c)).ToArray();
@@ -1101,10 +1117,15 @@ namespace AuctionMenu
 
                         if (databaseFile[i] == "For Sale:" && databaseFile[i + 1] == SignIn.username && databaseFile[i + 9] != "" && sortedArray[counter] == databaseFile[i + 3])
                         {
-
-                            if (databaseFile[i + 5] != "")
+                            
+							
+							if (databaseFile[i + 5] != "")
                             {
-                                counter++;
+								if (counter < 1)
+								{
+									WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amt");
+								}
+								counter++;
                                 Write(counter + "\t");
                                 tempArr[tempArrCount] = counter.ToString();
                                 tempArrCount++;
@@ -1129,18 +1150,30 @@ namespace AuctionMenu
 
 
                     }
-                    //Print no bids on your items brooke boi
-                    if (counter == sortedArray.Length)
+					if (counter == 0)
+					{
+						WriteLine("\nNo bids were found.");
+                        noBids = true;
+						break;
+					}
+					//Print no bids on your items brooke boi
+					if (counter == sortedArray.Length)
                     {
                         break;
                     }
+					
+
+				}
+                if (noBids == true)
+                {
+                    return;
                 }
-                Write("\nWould you like to sell something (yes or no)?\n");
+                Write("\n\nWould you like to sell something (yes or no)?\n");
                 Write("> ");
                 string yesOrNo = ReadLine();
                 if (yesOrNo == "yes" || yesOrNo == "YES")
                 {
-                    Write("\nPlease enter an integer between 1 and {0}\n", counter);
+                    Write("\nPlease enter an integer between 1 and {0}:\n", counter);
                     Write("> ");
                     string productIndex = ReadLine();
                     for (int a = 0; a < databaseFile.Length; a++)
@@ -1152,7 +1185,7 @@ namespace AuctionMenu
                                 if (databaseFile[b] == "For Sale:" && databaseFile[b + 1] == SignIn.username && databaseFile[b + 3] == tempArr[a + 1])
                                 {
                                     lineChanger("Sold:", "userDB.txt", b + 1);
-                                    WriteLine("\nYou have sold {0} to {1} for {2}", databaseFile[b + 1], databaseFile[b + 3], databaseFile[b + 5]);
+                                    WriteLine("\nYou have sold {0} to {1} for {2}.", databaseFile[b + 3], databaseFile[b + 6], databaseFile[b + 8]);
 
                                     break;
                                 }
