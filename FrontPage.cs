@@ -1161,11 +1161,7 @@ namespace AuctionMenu
 								if (counter < 1)
 								{
 									WriteLine("\nItem #\tProduct name\tDescription\tList price\tBidder name\tBidder email\tBid amt");
-								}
-								if (counter > 1)
-                                {
-                                    Write("\n");
-                                }
+								}								
 								counter++;
                                 Write(counter + "\t");
                                 tempArr[tempArrCount] = counter.ToString();
@@ -1181,10 +1177,11 @@ namespace AuctionMenu
                                     Write(databaseFile[i + j] + "\t");
                                     tempArr[tempArrCount] = databaseFile[i + j];
                                     tempArrCount++;
-
+                                    
                                 }
-                                
-                            }
+								Write("\n");
+
+							}
 
 
                         }

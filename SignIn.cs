@@ -13,14 +13,14 @@ namespace AuctionMenu
         public static string email;
         public static string password;
         public static string username;
-
-        public void userSignIn()
+		bool flag = true;
+		public void userSignIn()
         {
-			bool flag = true;
+			
             WriteLine("\nSign In");
             WriteLine("-------");
 
-            checkIfDBExists(flag);
+            flag = checkIfDBExists(flag);
             if (flag == false)
             {
                 return;
@@ -38,7 +38,7 @@ namespace AuctionMenu
         {
             if (!File.Exists("userDB.txt"))
             {
-                flag = false;
+                flag = false;                
                 WriteLine("\nNo database .txt file, try signing up first\n");
                 return flag;
             }
